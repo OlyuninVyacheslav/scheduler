@@ -1,11 +1,9 @@
 package com.scheduler.backend.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,19 +17,35 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "first_name", nullable = false)
+    @Getter
+    @Setter
     @Size(max = 100)
-    private String firstName;
+    @Column(name = "surname", length = 100, nullable = false)
+    private String surname;
 
-    @Column(name = "last_name", nullable = false)
+    @Getter
+    @Setter
     @Size(max = 100)
-    private String lastName;
+    @Column(name = "firstname", length = 100)
+    private String firstname;
 
-    @Column(nullable = false)
+    @Getter
+    @Setter
     @Size(max = 100)
-    private String login;
+    @Column(name = "patronymic", length = 100)
+    private String patronymic;
 
-    @Column(nullable = false)
     @Size(max = 100)
+    @NotNull
+    @Getter
+    @Setter
+    @Column(name = "email", nullable = false, length = 100, unique = true)
+    private String email;
+
+    @Size(max = 255)
+    @NotNull
+    @Getter
+    @Setter
+    @Column(name = "password", nullable = false)
     private String password;
 }
