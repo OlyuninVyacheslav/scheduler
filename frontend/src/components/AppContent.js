@@ -26,13 +26,13 @@ export default class AppContent extends React.Component {
         setAuthHeader(null);
     };
 
-    onLogin = (e, username, password) => {
+    onLogin = (e, email, password) => {
         e.preventDefault();
         request(
             "POST",
             "/login",
             {
-                login: username,
+                email: email,
                 password: password
             }).then(
             (response) => {
@@ -46,15 +46,16 @@ export default class AppContent extends React.Component {
         );
     };
 
-    onRegister = (event, firstName, lastName, username, password) => {
+    onRegister = (event, surname, firstname, patronymic, email, password) => {
         event.preventDefault();
         request(
             "POST",
             "/register",
             {
-                firstName: firstName,
-                lastName: lastName,
-                login: username,
+                surname: surname,
+                firstname: firstname,
+                patronymic: patronymic,
+                email: email,
                 password: password
             }).then(
             (response) => {

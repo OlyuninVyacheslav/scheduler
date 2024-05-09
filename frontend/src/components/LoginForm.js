@@ -6,13 +6,13 @@ export default class LoginForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            active: "login",
-            firstName: "",
-            lastName: "",
-            login: "",
-            password: "",
-            onLogin: props.onLogin,
-            onRegister: props.onRegister
+          surname: "",
+          firstname: "",
+          patronymic: "",
+          email: "",
+          password: "",
+          onLogin: props.onLogin,
+          onRegister: props.onRegister
         };
     };
 
@@ -23,11 +23,11 @@ export default class LoginForm extends React.Component {
     };
 
     onSubmitLogin = (e) => {
-        this.state.onLogin(e, this.state.login, this.state.password);
+        this.state.onLogin(e, this.state.email, this.state.password);
     };
 
     onSubmitRegister = (e) => {
-        this.state.onRegister(e, this.state.firstName, this.state.lastName, this.state.login, this.state.password);
+        this.state.onRegister(e, this.state.surname, this.state.firstname, this.state.patronymic, this.state.email, this.state.password);
     };
 
     render() {
@@ -50,13 +50,13 @@ export default class LoginForm extends React.Component {
                 <form onSubmit={this.onSubmitLogin}>
 
                   <div className="form-outline mb-4">
-                    <input type="login" id="loginName" name= "login" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="loginName">Username</label>
+                    <input type="email" id="email" name= "email" className="form-control" onChange={this.onChangeHandler}/>
+                    <label className="form-label" htmlFor="email">Эл. почта</label>
                   </div>
 
                   <div className="form-outline mb-4">
                     <input type="password" id="loginPassword" name="password" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="loginPassword">Password</label>
+                    <label className="form-label" htmlFor="loginPassword">Пароль</label>
                   </div>
 
                   <button type="submit" className="btn btn-primary btn-block mb-4">Sign in</button>
@@ -67,23 +67,28 @@ export default class LoginForm extends React.Component {
                 <form onSubmit={this.onSubmitRegister}>
 
                   <div className="form-outline mb-4">
-                    <input type="text" id="firstName" name="firstName" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="firstName">First name</label>
+                    <input type="text" id="surname" name="surname" className="form-control" onChange={this.onChangeHandler}/>
+                    <label className="form-label" htmlFor="surname">Фамилия</label>
                   </div>
 
                   <div className="form-outline mb-4">
-                    <input type="text" id="lastName" name="lastName" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="lastName">Last name</label>
+                    <input type="text" id="firstname" name="firstname" className="form-control" onChange={this.onChangeHandler}/>
+                    <label className="form-label" htmlFor="firstname">Имя</label>
                   </div>
 
                   <div className="form-outline mb-4">
-                    <input type="text" id="login" name="login" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="login">Username</label>
+                    <input type="text" id="patronymic" name="patronymic" className="form-control" onChange={this.onChangeHandler}/>
+                    <label className="form-label" htmlFor="patronymic">Отчество</label>
+                  </div>
+
+                  <div className="form-outline mb-4">
+                    <input type="text" id="email" name="email" className="form-control" onChange={this.onChangeHandler}/>
+                    <label className="form-label" htmlFor="email">Эл. почта</label>
                   </div>
 
                   <div className="form-outline mb-4">
                     <input type="password" id="registerPassword" name="password" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="registerPassword">Password</label>
+                    <label className="form-label" htmlFor="registerPassword">Пароль</label>
                   </div>
 
                   <button type="submit" className="btn btn-primary btn-block mb-3">Sign in</button>
