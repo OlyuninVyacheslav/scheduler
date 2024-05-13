@@ -1,21 +1,25 @@
-import logo from '../logo.svg';
-import './App.css';
-
-import Header from './Header';
-import AppContent from './AppContent';
+import React, { useEffect, useState } from 'react';
+import {Navbar} from "./Navbar";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { getAuthToken } from '../helpers/axios_helper'
+import LoginForm from './LoginForm';
 
 function App() {
+  const [isAuthenticated] = useState(getAuthToken() !== null && getAuthToken() !== "null");
   return (
-    <div className="App">
-      <Header pageTitle="Frontend authenticated with JWT" logoSrc={logo} />
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col">
-            <AppContent />
-          </div>
-        </div>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Navbar  isAuthenticated={isAuthenticated}/>
+      <Routes>
+      {isAuthenticated ? (
+              <>
+              </>
+            ) : (
+              <>
+                <Route path="/" element={<LoginForm />} />
+              </>
+            )}
+      </Routes>
+    </BrowserRouter>
   );
 }
 

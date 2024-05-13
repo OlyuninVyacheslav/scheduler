@@ -1,103 +1,180 @@
-import * as React from 'react';
-import classNames from 'classnames';
+import React, { useState } from 'react';
+import { request, setAuthHeader } from '../helpers/axios_helper';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default class LoginForm extends React.Component {
+const LoginForm = () => {
+  const [activeTab, setActiveTab] = useState('login');
+  const [formData, setFormData] = useState({
+    surname: '',
+    firstname: '',
+    patronymic: '',
+    email: '',
+    password: ''
+  });
 
-    constructor(props) {
-        super(props);
-        this.state = {
-          surname: "",
-          firstname: "",
-          patronymic: "",
-          email: "",
-          password: "",
-          onLogin: props.onLogin,
-          onRegister: props.onRegister
-        };
-    };
+  const onChangeHandler = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-    onChangeHandler = (event) => {
-        let name = event.target.name;
-        let value = event.target.value;
-        this.setState({[name] : value});
-    };
+  const onSubmitLogin = (e) => {
+    e.preventDefault();
+    request(
+        "POST",
+        "/login",
+        {
+            email: formData.email,
+            password: formData.password
+        }).then(
+        (response) => {
+            setAuthHeader(response.data.token);
+            window.location.reload();
+        }).catch(
+        (error) => {
+          setAuthHeader(null);
+            toast.error('Неверный логин или пароль!', {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 3000,
+            });
+        }
+    );
+  };
 
-    onSubmitLogin = (e) => {
-        this.state.onLogin(e, this.state.email, this.state.password);
-    };
+  const onSubmitRegister = (e) => {
+    e.preventDefault();
+    request(
+        "POST",
+        "/register",
+        {
+            surname: formData.surname,
+            firstname: formData.firstname,
+            patronymic: formData.patronymic,
+            email: formData.email,
+            password: formData.password
+        }).then(
+        (response) => {
+            setAuthHeader(response.data.token);
+            window.location.reload();
+        }).catch(
+        (error) => {
+            setAuthHeader(null);
+            toast.error('Произошла ошибка при регистрации!', {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 3000,
+            });
+        }
+    );
+  };
 
-    onSubmitRegister = (e) => {
-        this.state.onRegister(e, this.state.surname, this.state.firstname, this.state.patronymic, this.state.email, this.state.password);
-    };
+  return (
+    <div className="flex justify-center">
+      <div className="w-72">
+        <ul className="flex mb-3" role="tablist">
+          <li className="flex-1">
+            <button
+              className={`w-full py-2 rounded-t-lg ${activeTab === 'login' ? 'bg-emerald-500 text-white' : 'bg-gray-300'}`}
+              onClick={() => setActiveTab('login')}
+            >
+              Вход
+            </button>
+          </li>
+          <li className="flex-1">
+            <button
+              className={`w-full py-2 rounded-t-lg ${activeTab === 'register' ? 'bg-emerald-500 text-white' : 'bg-gray-300'}`}
+              onClick={() => setActiveTab('register')}
+            >
+              Регистрация
+            </button>
+          </li>
+        </ul>
 
-    render() {
-        return (
-        <div className="row justify-content-center">
-            <div className="col-4">
-            <ul className="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
-              <li className="nav-item" role="presentation">
-                <button className={classNames("nav-link", this.state.active === "login" ? "active" : "")} id="tab-login"
-                  onClick={() => this.setState({active: "login"})}>Login</button>
-              </li>
-              <li className="nav-item" role="presentation">
-                <button className={classNames("nav-link", this.state.active === "register" ? "active" : "")} id="tab-register"
-                  onClick={() => this.setState({active: "register"})}>Register</button>
-              </li>
-            </ul>
-
-            <div className="tab-content">
-              <div className={classNames("tab-pane", "fade", this.state.active === "login" ? "show active" : "")} id="pills-login" >
-                <form onSubmit={this.onSubmitLogin}>
-
-                  <div className="form-outline mb-4">
-                    <input type="email" id="email" name= "email" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="email">Эл. почта</label>
-                  </div>
-
-                  <div className="form-outline mb-4">
-                    <input type="password" id="loginPassword" name="password" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="loginPassword">Пароль</label>
-                  </div>
-
-                  <button type="submit" className="btn btn-primary btn-block mb-4">Sign in</button>
-
-                </form>
+        <div>
+          <div className={`p-4 ${activeTab === 'login' ? 'block' : 'hidden'}`}>
+            <form onSubmit={onSubmitLogin}>
+              <div className="mb-4">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  onChange={onChangeHandler}
+                  placeholder="Эл. почта"
+                />
               </div>
-              <div className={classNames("tab-pane", "fade", this.state.active === "register" ? "show active" : "")} id="pills-register" >
-                <form onSubmit={this.onSubmitRegister}>
-
-                  <div className="form-outline mb-4">
-                    <input type="text" id="surname" name="surname" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="surname">Фамилия</label>
-                  </div>
-
-                  <div className="form-outline mb-4">
-                    <input type="text" id="firstname" name="firstname" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="firstname">Имя</label>
-                  </div>
-
-                  <div className="form-outline mb-4">
-                    <input type="text" id="patronymic" name="patronymic" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="patronymic">Отчество</label>
-                  </div>
-
-                  <div className="form-outline mb-4">
-                    <input type="text" id="email" name="email" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="email">Эл. почта</label>
-                  </div>
-
-                  <div className="form-outline mb-4">
-                    <input type="password" id="registerPassword" name="password" className="form-control" onChange={this.onChangeHandler}/>
-                    <label className="form-label" htmlFor="registerPassword">Пароль</label>
-                  </div>
-
-                  <button type="submit" className="btn btn-primary btn-block mb-3">Sign in</button>
-                </form>
+              <div className="mb-4">
+                <input
+                  type="password"
+                  id="loginPassword"
+                  name="password"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  onChange={onChangeHandler}
+                  placeholder="Пароль"
+                />
               </div>
-            </div>
-            </div>
+              <button type="submit" className="w-full py-2 bg-emerald-500 text-white rounded">Войти</button>
+            </form>
+          </div>
+
+          <div className={`p-4 ${activeTab === 'register' ? 'block' : 'hidden'}`}>
+            <form onSubmit={onSubmitRegister}>
+              <div className="mb-4">
+                <input
+                  type="text"
+                  id="surname"
+                  name="surname"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  onChange={onChangeHandler}
+                  placeholder="Фамилия"
+                />
+              </div>
+              <div className="mb-4">
+                <input
+                  type="text"
+                  id="firstname"
+                  name="firstname"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  onChange={onChangeHandler}
+                  placeholder="Имя"
+                />
+              </div>
+              <div className="mb-4">
+                <input
+                  type="text"
+                  id="patronymic"
+                  name="patronymic"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  onChange={onChangeHandler}
+                  placeholder="Отчество"
+                />
+              </div>
+              <div className="mb-4">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  onChange={onChangeHandler}
+                  placeholder="Эл. почта"
+                />
+              </div>
+              <div className="mb-4">
+                <input
+                  type="password"
+                  id="registerPassword"
+                  name="password"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  onChange={onChangeHandler}
+                  placeholder="Пароль"
+                />
+              </div>
+              <button type="submit" className="w-full py-2 bg-emerald-500 text-white rounded">Зарегистрироваться</button>
+            </form>
+          </div>
         </div>
-        );
-    };
+      </div>
+    </div>
+  );
+};
 
-}
+export default LoginForm;
