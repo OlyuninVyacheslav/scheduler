@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @Data
 @Entity
-@Table(name = "user_")
+@Table(name = "app_user")
 public class User {
 
     @Id
