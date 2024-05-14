@@ -73,7 +73,7 @@ const LoginForm = () => {
         <ul className="flex mb-3" role="tablist">
           <li className="flex-1">
             <button
-              className={`w-full py-2 rounded-t-lg ${activeTab === 'login' ? 'bg-emerald-500 text-white' : 'bg-gray-300'}`}
+              className={`w-full py-2 rounded-t-lg ${activeTab === 'login' ? 'bg-gray-500 text-white' : 'bg-gray-300'}`}
               onClick={() => setActiveTab('login')}
             >
               Вход
@@ -81,7 +81,7 @@ const LoginForm = () => {
           </li>
           <li className="flex-1">
             <button
-              className={`w-full py-2 rounded-t-lg ${activeTab === 'register' ? 'bg-emerald-500 text-white' : 'bg-gray-300'}`}
+              className={`w-full py-2 rounded-t-lg ${activeTab === 'register' ? 'bg-gray-500 text-white' : 'bg-gray-300'}`}
               onClick={() => setActiveTab('register')}
             >
               Регистрация
@@ -112,7 +112,7 @@ const LoginForm = () => {
                   placeholder="Пароль"
                 />
               </div>
-              <button type="submit" className="w-full py-2 bg-emerald-500 text-white rounded">Войти</button>
+              <button type="submit" className="w-full py-2 bg-gray-500 text-white rounded">Войти</button>
             </form>
           </div>
 
@@ -168,7 +168,7 @@ const LoginForm = () => {
                   placeholder="Пароль"
                 />
               </div>
-              <button type="submit" className="w-full py-2 bg-emerald-500 text-white rounded">Зарегистрироваться</button>
+              <button type="submit" className="w-full py-2 bg-gray-500 text-white rounded">Зарегистрироваться</button>
             </form>
           </div>
         </div>

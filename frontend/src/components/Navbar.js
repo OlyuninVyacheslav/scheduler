@@ -11,8 +11,8 @@ function logout() {
 export const Navbar = ({ isAuthenticated }) => {
   return (
     <>
-      <nav className="h-20 mb-12 bg-emerald-600">
-        <div className="max-w-screen-xl mx-auto text-white text-lg font-semibold">
+      <nav className="h-20 mb-12 bg-gray-800">
+        <div className="mx-auto text-white text-lg font-semibold max-w-screen-xl">
           <ul className="flex">
             <li>
               <img
@@ -23,12 +23,12 @@ export const Navbar = ({ isAuthenticated }) => {
             </li>
             {isAuthenticated ? (
               <>
-                <li className="hover:bg-emerald-700 flex items-cetner px-2">
+                <li className="hover:bg-gray-700 flex items-cetner px-2">
                   <NavLink to="/boards" className="h-full flex items-center">
                     Доски
                   </NavLink>
                 </li>
-                <li className="bg-emerald-700 hover:bg-emerald-800 flex items-center px-2 ml-auto">
+                <li className="hover:bg-gray-700 flex items-center px-2 ml-auto">
                   <button
                     onClick={() => {
                       logout();
@@ -41,7 +41,7 @@ export const Navbar = ({ isAuthenticated }) => {
               </>
             ) : (
               <>
-              <li className="hover:bg-emerald-700 flex items-cetner px-2 ml-auto">
+              <li className="hover:bg-gray-700 flex items-cetner px-2 ml-auto">
                   <NavLink to="/" className="h-full flex items-center">
                     Войти
                   </NavLink>

@@ -11,6 +11,8 @@ const EntityCard = ({ entity }) => {
   );
 };
 
+const MemoizedEntityCard = React.memo(EntityCard); // Оптимизация рендеринга
+
 const BoardsList = () => {
   const [entities, setEntities] = useState([]);
 
@@ -30,7 +32,7 @@ const BoardsList = () => {
   return (
     <div className="max-w-screen-xl flex flex-wrap justify-center mx-auto">
       {entities.map(entity => (
-        <EntityCard key={entity.id} entity={entity} />
+        <MemoizedEntityCard key={entity.id} entity={entity} />
       ))}
     </div>
   );
