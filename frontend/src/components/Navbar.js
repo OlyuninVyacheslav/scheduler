@@ -24,7 +24,7 @@ export const Navbar = ({ isAuthenticated }) => {
             {isAuthenticated ? (
               <>
                 <li className="hover:bg-emerald-700 flex items-cetner px-2">
-                  <NavLink to="/" className="h-full flex items-center">
+                  <NavLink to="/boards" className="h-full flex items-center">
                     Доски
                   </NavLink>
                 </li>

@@ -3,6 +3,7 @@ import {Navbar} from "./Navbar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { getAuthToken } from '../helpers/axios_helper'
 import LoginForm from './LoginForm';
+import BoardsList from './BoardsList';
 
 function App() {
   const [isAuthenticated] = useState(getAuthToken() !== null && getAuthToken() !== "null");
@@ -12,6 +13,7 @@ function App() {
       <Routes>
       {isAuthenticated ? (
               <>
+                <Route path="/boards" element={<BoardsList/>}/>
               </>
             ) : (
               <>
