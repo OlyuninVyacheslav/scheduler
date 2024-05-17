@@ -1,2 +1,7 @@
-package com.scheduler.backend.repositories;public interface TaskUserRepository {
+package com.scheduler.backend.repositories;
+
+import com.scheduler.backend.entities.TaskUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TaskUserRepository extends JpaRepository<TaskUser, Long> {
 }

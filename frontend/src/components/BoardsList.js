@@ -7,7 +7,7 @@ const EntityCard = ({ entity }) => {
   return (
     <Link to={`/boards/${entity.id}`} className="border rounded p-4 m-2 hover:shadow-md transition duration-300 ease-in-out h-36 w-80 flex flex-col justify-start items-center">
       <h2 className="text-lg font-semibold">{entity.name}</h2>
-      <p className="text-gray-600">{entity.description}</p>
+      {/* <p className="text-gray-600">{entity.description}</p> */}
     </Link>
   );
 };

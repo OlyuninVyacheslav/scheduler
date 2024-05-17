@@ -5,12 +5,12 @@ spring:
         driver-class-name: org.postgresql.Driver
         url: jdbc:postgresql://localhost:5432/scheduler
         username: postgres
-        password: 1
+        password: root
     jpa:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         show-sql: false
         hibernate:
-            ddl-auto: create
+            ddl-auto: update #каждый раз не будет создаваться новая бд
 #    sql:
 #        init:
 #            platform: postgres
