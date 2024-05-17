@@ -14,12 +14,13 @@ export const Navbar = ({ isAuthenticated }) => {
       <nav className="h-20 mb-12 bg-gray-800">
         <div className="mx-auto text-white text-lg font-semibold max-w-screen-xl">
           <ul className="flex">
-            <li>
+            <li className="flex items-center mr-8">
               <img
-                className="h-20 p-2 mr-8"
+                className="h-20 p-2"
                 src={require("../pictures/logo.png")}
                 alt="Logo"
               />
+              <p className="text-white text-3xl">scheduler</p>
             </li>
             {isAuthenticated ? (
               <>

@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { getAuthToken } from '../helpers/axios_helper'
 import LoginForm from './LoginForm';
 import BoardsList from './BoardsList';
+import TaskBoard from './TaskBoard';
 
 function App() {
   const [isAuthenticated] = useState(getAuthToken() !== null && getAuthToken() !== "null");
@@ -18,6 +19,8 @@ function App() {
             ) : (
               <>
                 <Route path="/" element={<LoginForm />} />
+                <Route path="/boards" element={<BoardsList/>}/>
+                <Route path="/test" element={<TaskBoard/>}/>
               </>
             )}
       </Routes>
