@@ -12,7 +12,7 @@ const TaskType = ({ type, tasks, moveTask }) => {
   });
 
   return (
-    <div ref={drop} className={`w-1/2 p-4 rounded-lg ${isOver ? 'bg-blue-100' : 'bg-gray-100'}`}>
+    <div ref={drop} className={`w-1/2 p-4 rounded-lg ${isOver ? 'bg-cyan-100' : 'bg-neutral-200'}`}>
       <h2 className="text-xl font-bold mb-4">{type === 'in-progress' ? 'В процессе' : 'Завершено'}</h2>
       {tasks.map(task => (
         <TaskCard key={task.id} id={task.id} text={task.text} />

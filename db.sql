@@ -11,7 +11,6 @@ CREATE TABLE user_(
     id SERIAL PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role_id INT REFERENCES role_list(id),
     surname VARCHAR(100),
     firstname VARCHAR(100),
     patronymic VARCHAR(100)
@@ -20,28 +19,31 @@ CREATE TABLE user_(
 CREATE TABLE board(
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    description TEXT,
     creator_id INT REFERENCES user_(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE type_of_task(
+CREATE TABLE user_role(
+    board_id INT REFERENCES board(id) ON DELETE CASCADE,
+    user_id INT REFERENCES user_(id) ON DELETE CASCADE,
+    role_id INT REFERENCES role_list(id) ON DELETE CASCADE,
+    PRIMARY KEY (board_id, user_id, role_id)
+);
+
+CREATE TABLE type_list(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL,
+    board_id INT REFERENCES board(id)
 );
 
 CREATE TABLE task(
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    type_id INT REFERENCES type_of_task(id),
+    type_id INT REFERENCES type_list(id),
     descryption TEXT,
     deadline DATE,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE task_board(
-    board_id INT REFERENCES board(id) ON DELETE CASCADE,
-    task_id INT REFERENCES task(id) ON DELETE CASCADE,
-    PRIMARY KEY (board_id, task_id)
 );
 
 CREATE TABLE task_user(
