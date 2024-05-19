@@ -15,6 +15,7 @@ function App() {
       {isAuthenticated ? (
               <>
                 <Route path="/boards" element={<BoardsList/>}/>
+                <Route path="/boards/:boardId" component={TaskBoard} />
               </>
             ) : (
               <>
