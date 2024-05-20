@@ -34,6 +34,7 @@ CREATE TABLE user_role(
 CREATE TABLE type_list(
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    order INT,
     board_id INT REFERENCES board(id)
 );
 
@@ -42,7 +43,8 @@ CREATE TABLE task(
     name VARCHAR(255) NOT NULL,
     type_id INT REFERENCES type_list(id),
     descryption TEXT,
-    deadline DATE,
+    deadline TIMESTAMP WITHOUT TIME ZONE,
+    order INT,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

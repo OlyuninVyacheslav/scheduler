@@ -5,24 +5,25 @@ import { useParams } from 'react-router-dom';
 import { request } from '../helpers/axios_helper';
 import TaskType from './TaskType.js';
 import { testData } from './testData';
+import BoardControl from './BoardControl.js'
 
 const TaskBoard = () => {
   const { boardId } = useParams();
   const [taskTypes, setTaskTypes] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchTaskTypesAndTasks = async () => {
-  //     try {
-  //       const types = testData.taskTypes.filter(type => type.board_id === 1);
-  //       console.log(testData);
-  //       setTaskTypes(types);
-  //     } catch (error) {
-  //       console.error('Error fetching task types and tasks:', error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchTaskTypesAndTasks = async () => {
+      try {
+        const types = testData.taskTypes.filter(type => type.board_id === 1);
+        console.log(testData);
+        setTaskTypes(types);
+      } catch (error) {
+        console.error('Error fetching task types and tasks:', error);
+      }
+    };
 
-  //   fetchTaskTypesAndTasks();
-  // }, [boardId]);
+    fetchTaskTypesAndTasks();
+  }, [boardId]);
 
   useEffect(() => {
     const fetchTaskTypesAndTasks = async () => {
@@ -52,7 +53,7 @@ const TaskBoard = () => {
   const moveTask = async (taskId, toTypeId) => {
     try {
       // Выполняем запрос PUT для обновления типа задачи
-      await request('PUT', `/board/type/task/${taskId}`, { type_id: toTypeId });
+      // await request('PUT', `/board/type/task/${taskId}`, { type_id: toTypeId });
 
       // Обновляем состояние на клиенте
       setTaskTypes(prevTaskTypes => {
@@ -76,13 +77,16 @@ const TaskBoard = () => {
   };
   
   return (
+    <div>
+    <BoardControl boardId={boardId}/>
     <DndProvider backend={HTML5Backend}>
-      <div className="flex space-x-4">
+      <div className="flex space-x-4 max-w-screen-2xl mx-auto">
         {taskTypes.map(type => (
           <TaskType key={type.id} type={type} moveTask={moveTask} />
         ))}
       </div>
     </DndProvider>
+    </div>
   );
 };
 

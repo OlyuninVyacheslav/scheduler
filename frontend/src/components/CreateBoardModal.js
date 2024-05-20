@@ -4,24 +4,21 @@ import { request } from '../helpers/axios_helper';
 
 Modal.setAppElement('#root'); // Установите элемент приложения для повышения доступности
 
-const CreateBoardModal = ({ isOpen, onClose, currentUser }) => {
+const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
   const [name, setName] = useState('');
-  //const [description, setDescription] = useState('');
-  const [creatorId, setCreatorId] = useState('');
-  const [createdAt, setCreatorAt] = useState('');
+  const [description, setDescription] = useState('');
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      // await request('POST', '/board', { name, description });
-      await request('POST', '/boards/create', { name, creatorId, createdAt});
-      console.log("Name: " + name + " creatorId: " + creatorId + " createdAt: " + createdAt);
+      await request('POST', '/boards/create', { name, description });
       onClose();
+      onBoardCreated();
     } catch (error) {
       console.error('Error creating board:', error);
     }
   };
-  
 
   return (
     <Modal
@@ -43,7 +40,7 @@ const CreateBoardModal = ({ isOpen, onClose, currentUser }) => {
             required
           />
         </div>
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <label htmlFor="description" className="block text-gray-700">Описание</label>
           <textarea
             id="description"
@@ -52,9 +49,9 @@ const CreateBoardModal = ({ isOpen, onClose, currentUser }) => {
             onChange={(e) => setDescription(e.target.value)}
             required
           ></textarea>
-        </div> */}
+        </div>
         <div className="flex justify-end">
-          <button type="button" className="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded-md mr-2" onClick={onClose}>
+          <button type="button" className="bg-gray-300 hover:bg-gray-200 text-white px-4 py-2 rounded-md mr-2" onClick={onClose}>
             Отмена
           </button>
           <button type="submit" className="bg-cyan-500 hover:bg-cyan-400 text-white px-4 py-2 rounded-md">
