@@ -31,8 +31,8 @@ export const request = async (method, url, data) => {
         if (error.response && error.response.status === 401) {
             // Обработка ошибки 401 (Unauthorized)
             // Сброс токена
-            setAuthHeader(null);
-            window.location.href = '/';
+            // setAuthHeader(null);
+            // window.location.href = '/';
         } else {
             throw error; // Прокидываем другие ошибки дальше
         }
