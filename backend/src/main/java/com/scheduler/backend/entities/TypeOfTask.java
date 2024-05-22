@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "type_of_task")
+@Table(name = "type_list")
 public class TypeOfTask {
 
     @Id

@@ -20,7 +20,6 @@ import java.util.List;
 public class BoardController {
     private final UserRepository userRepository;
     private final BoardService boardService;
-
     private final BoardRepository boardRepository;
     private final UserAuthenticationProvider userAuthenticationProvider;
 
@@ -59,11 +58,6 @@ public class BoardController {
     }
 
 
-//    @GetMapping
-//    public ResponseEntity<List<BoardDto>> getAllBoards() {
-//        List<BoardDto> boards = boardService.getAllBoards();
-//        return ResponseEntity.ok(boards);
-//    }
 
     @GetMapping
     public ResponseEntity<List<BoardDto>> getAllBoards(@RequestHeader("Authorization") String token) {

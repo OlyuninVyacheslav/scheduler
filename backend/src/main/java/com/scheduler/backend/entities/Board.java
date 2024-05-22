@@ -26,6 +26,13 @@ public class Board {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
+    @Getter
+    @Setter
+    @NotNull
+    @Size(max = 255)
+    @Column(name = "description", nullable = false, length = 255)
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;
