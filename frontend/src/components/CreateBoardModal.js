@@ -51,10 +51,10 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
           ></textarea>
         </div>
         <div className="flex justify-end">
-          <button type="button" className="bg-gray-300 hover:bg-gray-200 text-white px-4 py-2 rounded-md mr-2" onClick={onClose}>
+          <button type="button" className="bg-gray-300 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2 hover:shadow-md" onClick={onClose}>
             Отмена
           </button>
-          <button type="submit" className="bg-cyan-500 hover:bg-cyan-400 text-white px-4 py-2 rounded-md">
+          <button type="submit" className="bg-cyan-500 hover:bg-cyan-400 text-white px-4 py-2 rounded-md hover:shadow-md">
             Создать
           </button>
         </div>

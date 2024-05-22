@@ -44,7 +44,7 @@ const BoardsList = () => {
   return (
     <div className="max-w-screen-xl items-start mx-auto">
       <p className="text-gray-700 font-semibold text-xl ml-4 mb-4">Доступные доски</p>
-      <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-4 py-2 rounded-md mb-4 ml-4" onClick={handleCreateBoard}>
+      <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-4 py-2 rounded-md mb-4 ml-4 hover:shadow-md" onClick={handleCreateBoard}>
         Создать доску
       </button>
       <div className="flex flex-wrap">

@@ -37,7 +37,7 @@ const BoardControl = ({ boardId }) => {
   return (
     <div className="max-w-screen-xl mx-auto mb-8">
       <button
-        className="bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-4 rounded"
+        className="bg-cyan-500 hover:bg-cyan-400 text-white hover:shadow-md font-bold py-2 px-4 rounded"
         onClick={openModal}
       >
         Создать новый вид задач
@@ -71,14 +71,14 @@ const BoardControl = ({ boardId }) => {
           <div className="flex justify-end">
             <button
               type="button"
-              className="bg-gray-300 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded mr-2"
+              className="bg-gray-300 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded mr-2 hover:shadow-md"
               onClick={closeModal}
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="bg-cyan-500 hover:bg-cyan-400 text-white py-2 px-4 rounded"
+              className="bg-cyan-500 hover:bg-cyan-400 text-white py-2 px-4 rounded hover:shadow-md"
             >
               Создать
             </button>
