@@ -67,7 +67,7 @@ const TaskData = ({ isOpen, onClose, task }) => {
       isOpen={isOpen}
       onRequestClose={handleClose}
       contentLabel="Task Details"
-      className="bg-white p-6 rounded-lg shadow-lg max-w-xl mx-auto"
+      className="bg-white p-4 rounded-lg shadow-lg max-w-xl mx-auto"
       overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
     >
       <div className="p-4">
@@ -86,25 +86,31 @@ const TaskData = ({ isOpen, onClose, task }) => {
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-4 flex">
+          <div className="flex items-center justify-between pb-1 w-full border-b-2 border-gray-300 mb-4">
+            <div className="flex items-center flex-grow">
+            <h2 className="text-2xl font-bold">
               {task.name}
+              </h2>
               <img
                 src={require("../pictures/edit.png")}
                 alt="Edit"
-                className="inline ml-2 cursor-pointer h-4 mt-2"
+                className="ml-2 cursor-pointer h-4 mt-2"
                 onClick={() => setIsEditingName(true)}
               />
+              </div>
+              <div>
                <img
                 src={require("../pictures/delete.png")}
                 alt="Delete Type"
                 className="cursor-pointer h-4 mt-2 ml-2"
                 onClick={() => setIsDeleteModalOpen(true)}
               />
-            </h2>
+              </div>
+            </div>
           </>
         )}
 
-        <p className="mb-2">
+        <p className="mb-4">
           {isEditingDescription ? (
             <>
               <textarea
