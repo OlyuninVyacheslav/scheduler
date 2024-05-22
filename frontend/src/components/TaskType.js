@@ -79,31 +79,35 @@ const TaskType = ({ type, moveTask }) => {
           </>
         ) : (
           <>
-            <div className="flex item-center">
-              <h2 className="text-xl font-bold">{type.name}</h2>
-              <img
-                src={require("../pictures/edit.png")}
-                alt="Edit Type"
-                className="cursor-pointer h-5 mt-1 ml-2"
-                onClick={() => setIsEditing(true)}
-              />
-              <img
-                src={require("../pictures/delete.png")}
-                alt="Delete Type"
-                className="cursor-pointer h-5 mt-1 ml-2"
-                onClick={() => setIsDeleteModalOpen(true)}
-              />
-            </div>
-            <div className="flex items-center">
-              <img
-                src={require("../pictures/add.png")}
-                alt="Add Task"
-                className="cursor-pointer h-6 ml-2"
-                onClick={handleOpenModal}
-              />
+            <div className="flex items-center justify-between border-b-2 border-gray-300 pb-1 w-full">
+              <div className="flex items-center flex-grow">
+                <h2 className="text-xl font-bold">{type.name}</h2>
+                <img
+                  src={require("../pictures/edit.png")}
+                  alt="Edit Type"
+                  className="cursor-pointer h-5 mt-1 ml-2"
+                  onClick={() => setIsEditing(true)}
+                />
+              </div>
+              <div>
+                <img
+                  src={require("../pictures/delete.png")}
+                  alt="Delete Type"
+                  className="cursor-pointer h-5 mt-1 ml-2"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                />
+              </div>
             </div>
           </>
         )}
+      </div>
+      <div className="mb-2 flex items-center">
+        <img
+          src={require("../pictures/add.png")}
+          alt="Add Task"
+          className="cursor-pointer h-6 ml-2"
+          onClick={handleOpenModal}
+        />
       </div>
       {type.tasks.map(task => (
         <TaskCard key={task.id} task={task} />
