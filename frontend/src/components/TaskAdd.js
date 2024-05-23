@@ -11,7 +11,7 @@ const TaskAdd = ({ isOpen, onClose, typeId }) => {
   const handleSave = async () => {
     try {
       const created_at = new Date().toISOString();
-      await request('POST', '/board/type/task/', {
+      await request('POST', '/board/type/task/create', {
         name,
         description,
         deadline,

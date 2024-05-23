@@ -53,7 +53,7 @@ const TaskBoard = () => {
   const moveTask = async (taskId, toTypeId) => {
     try {
       // Выполняем запрос PUT для обновления типа задачи
-      // await request('PUT', `/board/type/task/${taskId}`, { type_id: toTypeId });
+      await request('PUT', `/board/type/task/${taskId}`, { type_id: toTypeId });
 
       // Обновляем состояние на клиенте
       setTaskTypes(prevTaskTypes => {

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "role")
+@Table(name = "role_list")
 public class Role {
 
     @Id

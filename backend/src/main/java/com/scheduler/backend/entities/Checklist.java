@@ -29,8 +29,6 @@ public class Checklist {
     @Column(name = "name", length = 255, nullable = false)
     private String name;
 
-    @Column(name = "text")
-    private String text;
 
     @Column(name = "deadline")
     private LocalDate deadline;

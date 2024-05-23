@@ -17,6 +17,7 @@ function App() {
               <>
                 <Route path="/boards" element={<BoardsList/>}/>
                 <Route path="/boards/:boardId" component={<TaskBoard/>} />
+                <Route path="/test" element={<TaskBoard/>}/>
               </>
             ) : (
               <>
