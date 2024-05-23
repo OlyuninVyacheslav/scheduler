@@ -5,6 +5,7 @@ import { getAuthToken } from '../helpers/axios_helper'
 import LoginForm from './LoginForm';
 import BoardsList from './BoardsList';
 import TaskBoard from './TaskBoard';
+import Board from './test/Board'
 
 function App() {
   const [isAuthenticated] = useState(getAuthToken() !== null && getAuthToken() !== "null");
@@ -22,8 +23,8 @@ function App() {
               <>
                 <Route path="/" element={<LoginForm />} />
                 <Route path="/boards" element={<BoardsList/>}/>
-                <Route path="/test" element={<TaskBoard/>}/>
-                <Route path="/boards/:boardId" element={<TaskBoard/>} />
+                <Route path="/test" element={<Board/>}/>
+                <Route path="/boards/:boardId" element={<Board/>} />
               </>
             )}
       </Routes>
