@@ -64,13 +64,13 @@ const TaskType = ({ type, moveTask }) => {
             />
             <div className="flex ml-2">
               <button
-                className="mr-2 px-4 py-2 bg-blue-500 text-white rounded"
+                className="mr-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-white rounded"
                 onClick={handleSave}
               >
                 Сохранить
               </button>
               <button
-                className="px-4 py-2 bg-gray-300 rounded"
+                className="px-4 py-2 bg-gray-300 hover:bg-gray-200 text-gray-700 rounded"
                 onClick={handleCancel}
               >
                 Отменить
