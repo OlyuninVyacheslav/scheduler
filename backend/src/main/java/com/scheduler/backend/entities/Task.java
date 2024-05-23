@@ -30,7 +30,7 @@ public class Task {
     @Setter
     @ManyToOne // assuming FetchType.LAZY for better performance
     @JoinColumn(name = "type_id")
-    private TypeOfTask taskTypeId;
+    private TypeOfTask typeId;
 
     @Column(name = "descryption", columnDefinition = "text")
     @Getter

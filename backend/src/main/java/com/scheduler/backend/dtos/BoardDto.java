@@ -19,6 +19,8 @@ public class BoardDto {
     @Size(max = 255)
     private String name;
 
+    private String description;
+
     private User creator;
 
     private LocalDateTime createdAt;

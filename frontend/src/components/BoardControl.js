@@ -26,7 +26,7 @@ const BoardControl = ({ boardId }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const url = `/board/type/${boardId}`;
+      const url = `/board/${boardId}/type`;
       await request('POST', url, { name: taskTypeName });
       closeModal();
     } catch (error) {

@@ -8,7 +8,7 @@ export const testData = {
         {
           id: 1,
           name: 'Task 1',
-          type_id: 1,
+          type_id: 2,
           description: 'This is task 1',
           deadline: '2024-05-30',
           created_at: '2024-05-01T10:00:00Z',
