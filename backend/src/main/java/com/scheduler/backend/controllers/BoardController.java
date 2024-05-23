@@ -59,6 +59,7 @@ public class BoardController {
 
 
 
+
     @GetMapping
     public ResponseEntity<List<BoardDto>> getAllBoards(@RequestHeader("Authorization") String token) {
         try {
