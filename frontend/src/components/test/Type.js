@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import Task from './Task';
-import { AddIcon, DeleteIcon, EditIcon } from '../../icons/iconsList';
+import { AddIcon, CancelIcon, DeleteIcon, EditIcon } from '../../icons/iconsList';
 import { request } from '../../helpers/axios_helper';
 import DeleteConfirmationModal from '../DeleteConfirmationModal';
 import TaskAdd from '../TaskAdd';
@@ -61,7 +61,7 @@ const Type = ({ type, tasks, index }) => {
                     Сохранить
                   </button>
                   <div onClick={handleEditToggle}>
-                    <DeleteIcon />
+                    <CancelIcon />
                   </div>
                 </div>
               ) : (
@@ -106,7 +106,7 @@ const Type = ({ type, tasks, index }) => {
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
             onConfirm={handleDelete}
-            entityName={type.name}
+            entityName="Удалить тип задачи?"
           />
           <TaskAdd
             isOpen={isTaskAddModalOpen}

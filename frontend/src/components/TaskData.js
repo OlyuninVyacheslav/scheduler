@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { formatDate } from '../helpers/formatDate';
 import { request } from '../helpers/axios_helper';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
+import { CancelIcon, DeleteIcon, EditIcon } from '../icons/iconsList';
 
 const TaskData = ({ isOpen, onClose, task }) => {
   const [isEditingName, setIsEditingName] = useState(false);
@@ -67,44 +68,38 @@ const TaskData = ({ isOpen, onClose, task }) => {
       isOpen={isOpen}
       onRequestClose={handleClose}
       contentLabel="Task Details"
-      className="bg-white p-4 rounded-lg shadow-lg max-w-xl mx-auto"
+      className="bg-white p-4 rounded-lg shadow-lg w-72 mx-auto"
       overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
     >
       <div className="p-4">
         {isEditingName ? (
-          <>
+          <div className="mb-4">
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="border p-2 rounded w-full text-2xl font-bold"
+              className="border p-2 rounded w-full text-2xl font-bold outline-none"
             />
             <EditButtons
               onSave={() => handleSave('name')}
               onCancel={() => handleCancel('name')}
             />
-          </>
+          </div>
         ) : (
           <>
           <div className="flex items-center justify-between pb-1 w-full border-b-2 border-gray-300 mb-4">
             <div className="flex items-center flex-grow">
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-2xl font-bold text-gray-700">
               {task.name}
               </h2>
-              <img
-                src={require("../pictures/edit.png")}
-                alt="Edit"
-                className="ml-2 cursor-pointer h-4 mt-2"
-                onClick={() => setIsEditingName(true)}
-              />
+              <div className="mt-1" onClick={() => setIsEditingName(true)}>
+                <EditIcon/>
+              </div>
               </div>
               <div>
-               <img
-                src={require("../pictures/delete.png")}
-                alt="Delete Type"
-                className="cursor-pointer h-4 mt-2 ml-2"
-                onClick={() => setIsDeleteModalOpen(true)}
-              />
+              <div className="mt-1" onClick={() => setIsDeleteModalOpen(true)}>
+                <DeleteIcon/>
+              </div>
               </div>
             </div>
           </>
@@ -124,20 +119,16 @@ const TaskData = ({ isOpen, onClose, task }) => {
               />
             </>
           ) : (
-            <>
+            <div className="flex items-center">
               <span className="text-lg">{task.description}</span>
-              <img
-                src={require("../pictures/edit.png")}
-                alt="Edit"
-                className="inline ml-2 cursor-pointer h-4 mb-1"
-                onClick={() => setIsEditingDescription(true)}
-              />
-            </>
+              <div onClick={() => setIsEditingDescription(true)}>
+                <EditIcon/>
+              </div>
+            </div>
           )}
         </p>
 
         <p className="mb-2">
-          <span className="font-semibold">Срок до: </span>
           {isEditingDeadline ? (
             <>
               <input
@@ -152,20 +143,18 @@ const TaskData = ({ isOpen, onClose, task }) => {
               />
             </>
           ) : (
-            <>
-              {formatDate(task.deadline)}
-              <img
-                src={require("../pictures/edit.png")}
-                alt="Edit"
-                className="inline ml-2 cursor-pointer h-4 mb-1"
-                onClick={() => setIsEditingDeadline(true)}
-              />
-            </>
+            <div className="flex items-center">
+            <span className="font-semibold text-gray-700">Срок до:&nbsp;&nbsp;</span>
+            <span>{formatDate(task.deadline)}</span>
+              <div onClick={() => setIsEditingDeadline(true)}>
+                <EditIcon/>
+              </div>
+            </div>
           )}
         </p>
 
         <p className="mb-2">
-          <span className="font-semibold">Создано: </span>{formatDate(task.created_at)}
+          <span className="font-semibold text-gray-700">Создано: </span>{formatDate(task.created_at)}
         </p>
 
         <div className="flex justify-between items-center mt-4">
@@ -181,7 +170,7 @@ const TaskData = ({ isOpen, onClose, task }) => {
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDelete}
-          entityName="Вы уверены, что вы хотите удалить выбранную задачу?"
+          entityName="Удалить задачу?"
         />
       </div>
     </Modal>
@@ -191,18 +180,15 @@ const TaskData = ({ isOpen, onClose, task }) => {
 export default TaskData;
 
 const EditButtons = ({ onSave, onCancel }) => (
-  <div className="flex justify-end mt-2">
+  <div className="flex items-center justify-end mt-2">
     <button
       className="mr-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-white rounded"
       onClick={onSave}
     >
       Сохранить
     </button>
-    <button
-      className="px-4 py-2 bg-gray-300 hover:bg-gray-200 text-gray-700 rounded"
-      onClick={onCancel}
-    >
-      Отменить
-    </button>
+    <div onClick={onCancel}>
+      <CancelIcon/>
+    </div>
   </div>
 );

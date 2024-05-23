@@ -35,7 +35,7 @@ const BoardControl = ({ boardId }) => {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto mb-8">
+    <div className="ml-4 mb-8">
       <button
         className="bg-cyan-500 hover:bg-cyan-400 text-white hover:shadow-md font-bold py-2 px-4 rounded"
         onClick={openModal}
@@ -48,7 +48,7 @@ const BoardControl = ({ boardId }) => {
         className="modal bg-white p-6 rounded shadow-lg mx-auto my-8 w-96"
         overlayClassName="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <h2 className="text-xl font-bold mb-4">Новый вид задач</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-700">Новый вид задач</h2>
         {errorMessage && (
           <div className="text-red-500 mb-4">
             {errorMessage}
@@ -64,7 +64,7 @@ const BoardControl = ({ boardId }) => {
               type="text"
               value={taskTypeName}
               onChange={handleInputChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded outline-none"
               required
             />
           </div>

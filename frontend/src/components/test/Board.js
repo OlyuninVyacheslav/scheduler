@@ -4,6 +4,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import Type from './Type';
 import { request } from '../../helpers/axios_helper';
 import { initialData } from '../testData';
+import BoardControl from '../BoardControl';
 
 const Board = () => {
   const { boardId } = useParams();
@@ -157,6 +158,7 @@ const Board = () => {
 
   return (
     <div className="mx-auto w-11/12">
+      <BoardControl boardId={boardId}/>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="all-types" direction="horizontal" type="type">
           {(provided) => (
