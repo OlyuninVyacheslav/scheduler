@@ -7,9 +7,10 @@ import { initialData } from '../testData';
 import BoardControl from '../BoardControl';
 
 const Board = () => {
-  const { boardId } = useParams();
-//   const [data, setData] = useState({ types: {}, tasks: {} });
-  const [data, setData] = useState(initialData);
+  const params = useParams();
+  const boardId = params.boardId;
+  const [data, setData] = useState({ types: {}, tasks: {} });
+  // const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

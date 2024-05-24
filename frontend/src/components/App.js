@@ -16,15 +16,15 @@ function App() {
       {isAuthenticated ? (
               <>
                 <Route path="/boards" element={<BoardsList/>}/>
-                <Route path="/boards/:boardId" component={<TaskBoard/>} />
-                <Route path="/test" element={<TaskBoard/>}/>
+                <Route path="/boards/:boardId" element={<Board />} />
+                <Route path="*" element={<h2>Ресурс не найден</h2>} />
               </>
             ) : (
               <>
                 <Route path="/" element={<LoginForm />} />
-                <Route path="/boards" element={<BoardsList/>}/>
+                {/* <Route path="/boards" element={<BoardsList/>}/>
                 <Route path="/test" element={<Board/>}/>
-                <Route path="/boards/:boardId" element={<Board/>} />
+                <Route path="/boards/:boardId" element={<Board/>} /> */}
               </>
             )}
       </Routes>

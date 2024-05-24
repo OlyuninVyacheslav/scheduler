@@ -5,8 +5,9 @@ import CreateBoardModal from './CreateBoardModal';
 import { testEntities } from './testData';
 
 const EntityCard = ({ entity }) => {
+  const boardId = entity.id;
   return (
-    <Link to={`/boards/${entity.id}`} className="border rounded p-4 m-2 hover:shadow-md transition duration-300 ease-in-out h-36 w-80 flex flex-col justify-start items-center">
+    <Link to={`/boards/${boardId}`} className="border rounded p-4 m-2 hover:shadow-md transition duration-300 ease-in-out h-36 w-80 flex flex-col justify-start items-center">
       <h2 className="text-lg font-semibold">{entity.name}</h2>
       <p className="text-gray-600">{entity.description}</p>
     </Link>
@@ -16,8 +17,8 @@ const EntityCard = ({ entity }) => {
 const MemoizedEntityCard = React.memo(EntityCard); // Оптимизация рендеринга
 
 const BoardsList = () => {
-  const [entities, setEntities] = useState(testEntities);
-  // const [entities, setEntities] = useState([]);
+  // const [entities, setEntities] = useState(testEntities);
+  const [entities, setEntities] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchData = async () => {
