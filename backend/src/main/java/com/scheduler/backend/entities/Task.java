@@ -42,6 +42,11 @@ public class Task {
     @Setter
     private LocalDate deadline;
 
+    @Column(name = "order_")
+    @Getter
+    @Setter
+    private Integer order;
+
     @Column(name = "created_at")
     @Getter
     @Setter
