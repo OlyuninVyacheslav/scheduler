@@ -13,4 +13,6 @@ public interface TypeOfTaskRepository extends JpaRepository<TypeOfTask, Long> {
     @Query("SELECT t FROM TypeOfTask t WHERE t.board.id = :boardId")
     List<TypeOfTask> findByBoardId(@Param("boardId") Long boardId);
 
+    @Query("SELECT MAX(t.order) FROM TypeOfTask t WHERE t.board.id = :boardId")
+    Integer findMaxOrder(Long boardId);
 }

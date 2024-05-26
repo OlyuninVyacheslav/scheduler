@@ -32,7 +32,7 @@ public class Task {
     @JoinColumn(name = "type_id")
     private TypeOfTask typeId;
 
-    @Column(name = "descryption", columnDefinition = "text")
+    @Column(name = "description", columnDefinition = "text")
     @Getter
     @Setter
     private String description;

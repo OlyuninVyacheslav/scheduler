@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -47,6 +48,9 @@ public class TaskService {
         task.setTypeId(taskType);
         task.setDeadline(taskDto.getDeadline());
 
+        Integer maxOrder = taskRepository.findMaxOrderByTypeId(taskDto.getTypeId().getId());
+        task.setOrder(maxOrder != null ? maxOrder + 1 : 0);
+
         Task savedTask = taskRepository.save(task);
         return modelMapper.map(savedTask, TaskDto.class);
     }
@@ -56,9 +60,9 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
             .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
 
     // Ensure the task type exists before setting it
-    if (taskDto.getTypeId() != null && taskDto.getTypeId().getId() != null) {
+    if (taskDto.getTypeId() != null && taskDto.getTypeId() != null) {
         TypeOfTask taskType = taskTypeRepository.findById(taskDto.getTypeId().getId())
-                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId().getId()));
+                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId()));
         task.setTypeId(taskType);
     }
 
@@ -108,6 +112,10 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
         // Установка связей с другими сущностями, если необходимо
         // Например, boardId можно использовать для связи с доской
         taskTypeEntity.setBoard(board);
+        Integer maxOrder = taskTypeRepository.findMaxOrder(boardId);
+
+        // Устанавливаем порядковый номер нового типа задачи
+        taskTypeEntity.setOrder(maxOrder != null ? maxOrder + 1 : 0);
         // Сохранение в базе данных
         TypeOfTask savedTaskType = taskTypeRepository.save(taskTypeEntity);
 

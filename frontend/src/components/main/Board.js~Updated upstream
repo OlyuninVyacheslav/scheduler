@@ -7,10 +7,16 @@ import { initialData } from '../testData';
 import BoardControl from '../BoardControl';
 
 const Board = () => {
+<<<<<<< Updated upstream:frontend/src/components/main/Board.js
   const params = useParams();
   const boardId = params.boardId;
   const [data, setData] = useState({ types: {}, tasks: {} });
-   //const [data, setData] = useState(initialData);
+  // const [data, setData] = useState(initialData);
+=======
+  const { boardId } = useParams();
+  //const [data, setData] = useState({ types: {}, tasks: {} });
+  const [data, setData] = useState(initialData);
+>>>>>>> Stashed changes:frontend/src/components/test/Board.js
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {

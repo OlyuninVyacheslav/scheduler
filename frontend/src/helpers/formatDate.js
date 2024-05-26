@@ -10,3 +10,13 @@ export const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('ru-RU', options).format(date);
   };
+
+  export const formatDateDead = (dateString) => {
+    const options = {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    };
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('ru-RU', options).format(date);
+  };

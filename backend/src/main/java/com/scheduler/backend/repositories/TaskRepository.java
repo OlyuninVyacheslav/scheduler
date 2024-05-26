@@ -12,8 +12,10 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 //    List<Task> findByTaskTypeId(Long taskTypeId);
-    @Query("SELECT t FROM Task t WHERE t.typeId.id = :taskTypeId")
-    List<Task> findByTaskTypeId(@Param("taskTypeId") Long taskTypeId);
+    @Query("SELECT t FROM Task t WHERE t.typeId.id = :typeId")
+    List<Task> findByTaskTypeId(@Param("typeId") Long typeId);
 
+    @Query("SELECT MAX(t.order) FROM Task t WHERE t.typeId.id = :typeId")
+    Integer findMaxOrderByTypeId(@Param("typeId") Long typeId);
 
 }
