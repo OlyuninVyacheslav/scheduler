@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { formatDate } from '../../helpers/formatDate';
-import TaskData from '../TaskData';
+import TaskData from '../TaskDataModal';
 
 const Task = ({ task, index }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);

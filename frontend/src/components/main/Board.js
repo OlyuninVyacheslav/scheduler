@@ -13,36 +13,40 @@ const Board = () => {
   // const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const typesResponse = await request('GET', `/board/types/${boardId}`);
-        const typesData = typesResponse.data;
+  const fetchData = async () => {
+    try {
+      const typesResponse = await request('GET', `/board/types/${boardId}`);
+      const typesData = typesResponse.data;
 
-        const tasksData = {};
+      const tasksData = {};
 
-        for (const type of typesData) {
-          const tasksResponse = await request('GET', `/board/type/tasks/${type.id}`);
-          tasksResponse.data.forEach(task => {
-            tasksData[task.id] = task;
-          });
-        }
-
-        const formattedTypes = typesData.reduce((acc, type) => {
-          acc[type.id] = type;
-          return acc;
-        }, {});
-
-        setData({ types: formattedTypes, tasks: tasksData });
-      } catch (error) {
-        console.error("Failed to fetch data", error);
-      } finally {
-        setLoading(false);
+      for (const type of typesData) {
+        const tasksResponse = await request('GET', `/board/type/tasks/${type.id}`);
+        tasksResponse.data.forEach(task => {
+          tasksData[task.id] = task;
+        });
       }
-    };
 
+      const formattedTypes = typesData.reduce((acc, type) => {
+        acc[type.id] = type;
+        return acc;
+      }, {});
+
+      setData({ types: formattedTypes, tasks: tasksData });
+    } catch (error) {
+      console.error("Failed to fetch data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [boardId]);
+
+  const refreshBoard = () => {
+    fetchData();
+  };
 
   const onDragEnd = async (result) => {
     const { destination, source, draggableId, type } = result;
@@ -159,7 +163,7 @@ const Board = () => {
 
   return (
     <div className="mx-auto w-11/12">
-      <BoardControl boardId={boardId}/>
+      <BoardControl boardId={boardId} refreshBoard={refreshBoard} />
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="all-types" direction="horizontal" type="type">
           {(provided) => (
@@ -175,7 +179,7 @@ const Board = () => {
                     .filter(task => task.typeId === type.id)
                     .sort((a, b) => a.order - b.order);
 
-                  return <Type key={type.id} type={type} tasks={tasks} index={index} />;
+                  return <Type key={type.id} type={type} tasks={tasks} index={index} refreshBoard={refreshBoard} />;
                 })}
               {provided.placeholder}
             </div>

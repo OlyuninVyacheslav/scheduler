@@ -4,9 +4,9 @@ import Task from './Task';
 import { AddIcon, CancelIcon, DeleteIcon, EditIcon } from '../../icons/iconsList';
 import { request } from '../../helpers/axios_helper';
 import DeleteConfirmationModal from '../DeleteConfirmationModal';
-import TaskAdd from '../TaskAdd';
+import CreateTaskModal from '../CreateTaskModal';
 
-const Type = ({ type, tasks, index }) => {
+const Type = ({ type, tasks, index, refreshBoard }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTypeName, setNewTypeName] = useState(type.name);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -20,6 +20,7 @@ const Type = ({ type, tasks, index }) => {
     try {
       await request('PUT', `/board/type/${type.id}`, { id: type.id, name: newTypeName });
       handleEditToggle();
+      refreshBoard();
     } catch (error) {
       console.error('Failed to update type name', error);
     }
@@ -28,7 +29,7 @@ const Type = ({ type, tasks, index }) => {
   const handleDelete = async () => {
     try {
       await request('DELETE', `/board/type/${type.id}`);
-      // Handle removing the type from the state in the parent component
+      refreshBoard();
     } catch (error) {
       console.error('Failed to delete type', error);
     } finally {
@@ -108,10 +109,11 @@ const Type = ({ type, tasks, index }) => {
             onConfirm={handleDelete}
             entityName="Удалить тип задачи?"
           />
-          <TaskAdd
+          <CreateTaskModal
             isOpen={isTaskAddModalOpen}
             onClose={() => setIsTaskAddModalOpen(false)}
             typeId={type.id}
+            refreshBoard={refreshBoard}
           />
         </div>
       )}

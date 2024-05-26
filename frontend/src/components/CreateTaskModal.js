@@ -1,9 +1,8 @@
-// TaskAdd.js
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { request } from '../helpers/axios_helper';
 
-const TaskAdd = ({ isOpen, onClose, typeId }) => {
+const CreateTaskModal = ({ isOpen, onClose, typeId, refreshBoard }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -19,6 +18,7 @@ const TaskAdd = ({ isOpen, onClose, typeId }) => {
         created_at,
       });
       onClose();
+      refreshBoard(); // Refresh the board data
     } catch (error) {
       console.error('Error creating task:', error);
     }
@@ -86,4 +86,4 @@ const TaskAdd = ({ isOpen, onClose, typeId }) => {
   );
 };
 
-export default TaskAdd;
+export default CreateTaskModal;
