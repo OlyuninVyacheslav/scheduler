@@ -50,12 +50,28 @@ public class TaskController {
 
     }
 
+    @GetMapping("/types/{boardId}")
+    public ResponseEntity<List<TypeOfTaskDto>> getTaskTypesByBoardId(@PathVariable Long boardId, @RequestHeader("Authorization") String token) {
+        try {
+            String jwt = token.substring(7);
+            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
+            List<TypeOfTaskDto> taskTypes = taskService.getTaskTypesByBoardId(boardId);
+            return ResponseEntity.ok(taskTypes);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+
     //region TaskType
     @PostMapping("/{boardId}/type")
     public ResponseEntity<TypeOfTaskDto> createTaskType(@PathVariable Long boardId, @RequestBody TypeOfTaskDto taskTypeDto, @RequestHeader("Authorization") String token) {
         try {
             String jwt = token.substring(7);
             Authentication authentication = userAuthenticationProvider.validateToken(jwt);
+
             TypeOfTaskDto createdTaskType = taskService.createTaskType(boardId, taskTypeDto);
             return new ResponseEntity<>(createdTaskType, HttpStatus.CREATED);
         } catch (EntityNotFoundException e){

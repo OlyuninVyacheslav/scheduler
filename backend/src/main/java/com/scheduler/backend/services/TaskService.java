@@ -2,11 +2,13 @@ package com.scheduler.backend.services;
 
 import com.scheduler.backend.dtos.TaskDto;
 import com.scheduler.backend.dtos.TypeOfTaskDto;
+import com.scheduler.backend.entities.Board;
 import com.scheduler.backend.entities.Task;
 import com.scheduler.backend.entities.TypeOfTask;
-import com.scheduler.backend.entities.User;
+import com.scheduler.backend.repositories.BoardRepository;
 import com.scheduler.backend.repositories.TaskRepository;
 import com.scheduler.backend.repositories.TypeOfTaskRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TypeOfTaskRepository taskTypeRepository;
     private final ModelMapper modelMapper;
-
+    private final BoardRepository boardRepository;
     @Autowired
-    public TaskService(TaskRepository taskRepository, TypeOfTaskRepository taskTypeRepository, ModelMapper modelMapper) {
+    public TaskService(TaskRepository taskRepository, TypeOfTaskRepository taskTypeRepository, ModelMapper modelMapper, BoardRepository boardRepository) {
         this.taskRepository = taskRepository;
         this.taskTypeRepository = taskTypeRepository;
         this.modelMapper = modelMapper;
+        this.boardRepository = boardRepository;
     }
 
     @Transactional
@@ -97,12 +100,14 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
     }
 
     public TypeOfTaskDto createTaskType(Long boardId, TypeOfTaskDto taskTypeDto) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new EntityNotFoundException("Board not found"));
         // Дополнительная логика валидации и сохранения типа задачи
         TypeOfTask taskTypeEntity = new TypeOfTask();
         taskTypeEntity.setName(taskTypeDto.getName());
         // Установка связей с другими сущностями, если необходимо
         // Например, boardId можно использовать для связи с доской
-
+        taskTypeEntity.setBoard(board);
         // Сохранение в базе данных
         TypeOfTask savedTaskType = taskTypeRepository.save(taskTypeEntity);
 
@@ -134,5 +139,12 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
 
         // Удаляем сам тип задачи
         taskTypeRepository.deleteById(typeId);
+    }
+
+    public List<TypeOfTaskDto> getTaskTypesByBoardId(Long boardId) {
+        List<TypeOfTask> types = taskTypeRepository.findByBoardId(boardId);
+        return types.stream()
+                .map(type -> new TypeOfTaskDto(type.getId(), type.getName(), type.getOrder()))
+                .collect(Collectors.toList());
     }
 }
