@@ -42,7 +42,7 @@ CREATE TABLE task(
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     type_id INT REFERENCES type_list(id),
-    descryption TEXT,
+    description TEXT,
     deadline TIMESTAMP WITHOUT TIME ZONE,
     order_ INT,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
