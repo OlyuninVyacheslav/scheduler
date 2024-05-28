@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
-import { formatDate } from '../helpers/formatDate';
+import { formatDate, formatDateDead } from '../helpers/formatDate';
 import { request } from '../helpers/axios_helper';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import { CancelIcon, DeleteIcon, EditIcon } from '../icons/iconsList';
@@ -145,7 +145,7 @@ const TaskData = ({ isOpen, onClose, task }) => {
           ) : (
             <div className="flex items-center">
             <span className="font-semibold text-gray-700">Срок до:&nbsp;&nbsp;</span>
-            <span>{formatDate(task.deadline)}</span>
+            <span>{formatDateDead(task.deadline)}</span>
               <div onClick={() => setIsEditingDeadline(true)}>
                 <EditIcon/>
               </div>
@@ -154,7 +154,7 @@ const TaskData = ({ isOpen, onClose, task }) => {
         </p>
 
         <p className="mb-2">
-          <span className="font-semibold text-gray-700">Создано: </span>{formatDate(task.created_at)}
+          <span className="font-semibold text-gray-700">Создано: </span>{formatDate(task.createdAt)}
         </p>
 
         <div className="flex justify-between items-center mt-4">

@@ -38,7 +38,7 @@ const Type = ({ type, tasks, index, refreshBoard }) => {
   };
 
   return (
-    <Draggable draggableId={type.id} index={index}>
+    <Draggable draggableId={type.id.toString()} index={index}>
       {(provided) => (
         <div
           className="bg-gray-200 rounded p-4 w-72 hover:shadow-xl"
@@ -80,7 +80,7 @@ const Type = ({ type, tasks, index, refreshBoard }) => {
               <DeleteIcon />
             </div>}
           </div>
-          <Droppable droppableId={type.id} type="task">
+          <Droppable droppableId={type.id.toString()} type="task">
             {(provided) => (
               <div
                 className="rounded p-2 h-full"

@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -40,15 +39,16 @@ public class TaskService {
     public TaskDto createTask(TaskDto taskDto) {
         Task task = modelMapper.map(taskDto, Task.class);
 
-        TypeOfTask taskType = taskTypeRepository.findById(taskDto.getTypeId().getId())
+        TypeOfTask taskType = taskTypeRepository.findById(taskDto.getTypeId())
                 .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId()));
+
         task.setName(taskDto.getName());
         task.setCreatedAt(LocalDateTime.now());
         task.setDescription(taskDto.getDescription());
         task.setTypeId(taskType);
         task.setDeadline(taskDto.getDeadline());
 
-        Integer maxOrder = taskRepository.findMaxOrderByTypeId(taskDto.getTypeId().getId());
+        Integer maxOrder = taskRepository.findMaxOrderByTypeId(taskDto.getTypeId());
         task.setOrder(maxOrder != null ? maxOrder + 1 : 0);
 
         Task savedTask = taskRepository.save(task);
@@ -61,7 +61,7 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
 
     // Ensure the task type exists before setting it
     if (taskDto.getTypeId() != null && taskDto.getTypeId() != null) {
-        TypeOfTask taskType = taskTypeRepository.findById(taskDto.getTypeId().getId())
+        TypeOfTask taskType = taskTypeRepository.findById(taskDto.getTypeId())
                 .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId()));
         task.setTypeId(taskType);
     }
@@ -96,10 +96,27 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
         taskRepository.delete(task);
     }
 
-    public List<TaskDto> getTasksByType(Long typeId) {
-        List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
-        return tasks.stream()
-                .map(task -> modelMapper.map(task, TaskDto.class))
+//    public List<TaskDto> getTasksByType(Long typeId) {
+//        List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
+//        return tasks.stream()
+//                .map(task -> modelMapper.map(task, TaskDto.class))
+//                //.map(task -> new TaskDto(task.getId(), task.getName(), task.getTypeId(),task.getDescription(), task.getDeadline(), task.getOrder(), task.getCreatedAt()))
+//                .collect(Collectors.toList());
+//    }
+public List<TaskDto> getTasksByType(Long typeId) {
+    List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
+    return tasks.stream()
+            .map(task -> {
+                TaskDto taskDto = modelMapper.map(task, TaskDto.class);
+                taskDto.setTypeId(task.getTypeId().getId());
+                return taskDto;
+            })
+            .collect(Collectors.toList());
+}
+    public List<TypeOfTaskDto> getTaskTypesByBoardId(Long boardId) {
+        List<TypeOfTask> types = taskTypeRepository.findByBoardId(boardId);
+        return types.stream()
+                .map(type -> new TypeOfTaskDto(type.getId(), type.getName(), type.getOrder()))
                 .collect(Collectors.toList());
     }
 
@@ -149,10 +166,9 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
         taskTypeRepository.deleteById(typeId);
     }
 
-    public List<TypeOfTaskDto> getTaskTypesByBoardId(Long boardId) {
-        List<TypeOfTask> types = taskTypeRepository.findByBoardId(boardId);
-        return types.stream()
-                .map(type -> new TypeOfTaskDto(type.getId(), type.getName(), type.getOrder()))
-                .collect(Collectors.toList());
-    }
+
+
+
+
+
 }

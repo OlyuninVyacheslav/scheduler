@@ -5,12 +5,13 @@ import Type from './Type';
 import { request } from '../../helpers/axios_helper';
 import { initialData } from '../testData';
 import BoardControl from '../BoardControl';
+import { formatDate, formatDateDead } from '../../helpers/formatDate';
 
 const Board = () => {
   const params = useParams();
   const boardId = params.boardId;
   const [data, setData] = useState({ types: {}, tasks: {} });
-   //const [data, setData] = useState(initialData);
+  //const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -176,7 +177,7 @@ const Board = () => {
                 .sort((a, b) => a.order - b.order)
                 .map((type, index) => {
                   const tasks = Object.values(data.tasks)
-                    .filter(task => task.typeId === type.id)
+                    .filter(task => task.typeId === type.id) // Ensure correct mapping
                     .sort((a, b) => a.order - b.order);
 
                   return <Type key={type.id} type={type} tasks={tasks} index={index} refreshBoard={refreshBoard} />;

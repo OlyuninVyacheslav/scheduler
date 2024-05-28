@@ -6,19 +6,20 @@ const CreateTaskModal = ({ isOpen, onClose, typeId, refreshBoard }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
-  const [order, setOrder] = useState(0);
+  const [order, setOrder] = useState('');
 
   const handleSave = async () => {
     try {
-      const created_at = new Date().toISOString();
+      const createdAt = new Date().toISOString();
+      
       await request('POST', '/board/type/task/create', {
         name,
         description,
-        deadline: new Date(deadline).toISOString(),
+        deadline,
         typeId,
-        order,
-        created_at,
+        createdAt,
       });
+    
       onClose();
       refreshBoard(); // Refresh the board data
     } catch (error) {

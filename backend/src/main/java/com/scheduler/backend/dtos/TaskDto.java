@@ -19,7 +19,8 @@ public class TaskDto {
     @Size(max = 255)
     private String name;
 
-    private TypeOfTask typeId;
+
+    private Long typeId;
 
     private String description;
 

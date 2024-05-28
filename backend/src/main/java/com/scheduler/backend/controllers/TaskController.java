@@ -6,11 +6,10 @@ import com.scheduler.backend.dtos.UserDto;
 import com.scheduler.backend.entities.TypeOfTask;
 import com.scheduler.backend.entities.User;
 import com.scheduler.backend.repositories.TaskRepository;
+import com.scheduler.backend.repositories.TypeOfTaskRepository;
 import com.scheduler.backend.repositories.UserRepository;
 import com.scheduler.backend.services.TaskService;
 import jakarta.persistence.EntityNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +24,15 @@ import java.util.NoSuchElementException;
 public class TaskController {
     private final TaskService taskService;
     private final TaskRepository taskRepository;
+    private final TypeOfTaskRepository typeOfTaskRepository;
     private final UserRepository userRepository;
     private final UserAuthenticationProvider userAuthenticationProvider;
 
     @Autowired
-    public TaskController(TaskService taskService, TaskRepository taskRepository, UserRepository userRepository, UserAuthenticationProvider userAuthenticationProvider) {
+    public TaskController(TaskService taskService, TaskRepository taskRepository, TypeOfTaskRepository typeOfTaskRepository, UserRepository userRepository, UserAuthenticationProvider userAuthenticationProvider) {
         this.taskService = taskService;
         this.taskRepository = taskRepository;
+        this.typeOfTaskRepository = typeOfTaskRepository;
         this.userRepository = userRepository;
         this.userAuthenticationProvider = userAuthenticationProvider;
     }
@@ -49,6 +50,8 @@ public class TaskController {
         }
 
     }
+
+
 
     @GetMapping("/types/{boardId}")
     public ResponseEntity<List<TypeOfTaskDto>> getTaskTypesByBoardId(@PathVariable Long boardId, @RequestHeader("Authorization") String token) {
@@ -110,17 +113,37 @@ public class TaskController {
     //endregion
 
     //region Task
+//    @PostMapping("/type/task/create")
+//    public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
+//        try {
+//            String jwt = token.substring(7);
+//            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
+//            TaskDto createdTask = taskService.createTask(taskDto);
+//            System.out.println(createdTask);
+//            return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
+//        } catch (EntityNotFoundException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        }
+//    }
     @PostMapping("/type/task/create")
-    public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
         try {
             String jwt = token.substring(7);
             Authentication authentication = userAuthenticationProvider.validateToken(jwt);
+            TypeOfTask taskType = typeOfTaskRepository.findById(taskDto.getTypeId())
+                    .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId()));
+            taskDto.setTypeId(taskType.getId());
             TaskDto createdTask = taskService.createTask(taskDto);
             return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (NoSuchElementException | EntityNotFoundException e) {
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (SecurityException e) {
+            return new ResponseEntity<>("Error: Invalid or expired token", HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
