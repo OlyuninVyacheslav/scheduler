@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { request } from '../helpers/axios_helper';
 
 const CreateTaskModal = ({ isOpen, onClose, typeId, refreshBoard }) => {
+  const [id, setId] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -13,6 +14,7 @@ const CreateTaskModal = ({ isOpen, onClose, typeId, refreshBoard }) => {
       const createdAt = new Date().toISOString();
       
       await request('POST', '/board/type/task/create', {
+        id,
         name,
         description,
         deadline,

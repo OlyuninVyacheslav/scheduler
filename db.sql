@@ -38,8 +38,18 @@ CREATE TABLE type_list(
     board_id INT REFERENCES board(id)
 );
 
+CREATE SEQUENCE task_id_seq;
+
+CREATE OR REPLACE FUNCTION generate_task_id()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.id := 'TASK-' || TO_CHAR(nextval('task_id_seq'), 'FM0000');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE task(
-    id SERIAL PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     type_id INT REFERENCES type_list(id),
     description TEXT,
@@ -48,9 +58,14 @@ CREATE TABLE task(
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TRIGGER task_id_trigger
+BEFORE INSERT ON task
+FOR EACH ROW
+EXECUTE FUNCTION generate_task_id();
+
 CREATE TABLE task_user(
     user_id INT REFERENCES user_(id) ON DELETE CASCADE,
-    task_id INT REFERENCES task(id) ON DELETE CASCADE,
+    task_id VARCHAR(255) REFERENCES task(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, task_id)
 );
 

@@ -15,9 +15,12 @@ import java.time.LocalDateTime;
 @Table(name = "task")
 public class Task {
 
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id", nullable = false, unique = true, length = 255)
+    private String id;
 
     @NotNull
     @Getter

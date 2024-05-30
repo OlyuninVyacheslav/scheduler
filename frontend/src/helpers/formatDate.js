@@ -13,7 +13,7 @@
 
 export const formatDate = (dateArray) => {
   const [year, month, day, hours, minutes, seconds, milliseconds] = dateArray;
-  const date = new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
+  const date = new Date(year, month -1, day, hours, minutes, seconds, milliseconds);
   const options = {
     day: '2-digit',
     month: '2-digit',

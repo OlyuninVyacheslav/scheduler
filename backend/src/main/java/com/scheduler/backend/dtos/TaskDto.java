@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 @Builder
 public class TaskDto {
 
-    private Long id;
+    private String id;
 
     @NotBlank
     @Size(max = 255)

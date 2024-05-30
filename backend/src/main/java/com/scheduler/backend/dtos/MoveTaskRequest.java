@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MoveTaskRequest {
-    private Long taskId;
+    private String taskId;
     private Long sourceTypeId;
     private Long destinationTypeId;
     private Integer newOrder;

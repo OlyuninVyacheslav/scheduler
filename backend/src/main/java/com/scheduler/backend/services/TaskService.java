@@ -7,7 +7,6 @@ import com.scheduler.backend.entities.Task;
 import com.scheduler.backend.entities.TypeOfTask;
 import com.scheduler.backend.repositories.BoardRepository;
 import com.scheduler.backend.repositories.TaskRepository;
-import com.scheduler.backend.repositories.TaskUserRepository;
 import com.scheduler.backend.repositories.TypeOfTaskRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -59,7 +58,7 @@ public class TaskService {
         return modelMapper.map(savedTask, TaskDto.class);
     }
 
-public TaskDto updateTask(Long taskId, TaskDto taskDto) {
+public TaskDto updateTask(String taskId, TaskDto taskDto) {
     Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
 
@@ -91,7 +90,7 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
 //        Task movedTask = taskRepository.save(task);
 //        return modelMapper.map(movedTask, TaskDto.class);
 //    }
-public void moveTask(Long taskId, Long sourceTypeId, Long destinationTypeId, Integer newOrder) {
+public void moveTask(String taskId, Long sourceTypeId, Long destinationTypeId, Integer newOrder) {
     Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
 
@@ -127,7 +126,7 @@ public void moveTask(Long taskId, Long sourceTypeId, Long destinationTypeId, Int
 }
 
 
-    public void deleteTask(Long taskId) {
+    public void deleteTask(String taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
 
@@ -174,6 +173,15 @@ public List<TaskDto> getTasksByType(Long typeId) {
         // Другие поля, если необходимо
 
         return createdTaskTypeDto;
+    }
+
+    public void moveTypes(List<TypeOfTaskDto> updatedTypes) {
+        for (TypeOfTaskDto updatedType : updatedTypes) {
+            TypeOfTask type = taskTypeRepository.findById(updatedType.getId())
+                    .orElseThrow(() -> new NoSuchElementException("BoardType not found with id: " + updatedType.getId()));
+            type.setOrder(updatedType.getOrder());
+            taskTypeRepository.save(type);
+        }
     }
 
     public TypeOfTaskDto updateTaskType(Long typeId, TypeOfTaskDto updatedTypeDto) {

@@ -59,10 +59,7 @@ const Board = () => {
       const [moved] = newTypeOrder.splice(source.index, 1);
       newTypeOrder.splice(destination.index, 0, moved);
   
-      const updatedTypes = newTypeOrder.reduce((acc, type, index) => {
-        acc[type.id] = { ...type, order: index };
-        return acc;
-      }, {});
+      const updatedTypes = newTypeOrder.map((type, index) => ({ id: type.id, name:type.name, order: index })); // Construct an array of TypeOfTaskDto objects
   
       const newState = {
         ...data,
@@ -72,7 +69,9 @@ const Board = () => {
       setData(newState);
   
       try {
-        await request('PUT', `/board/types/${boardId}`, { types: Object.values(updatedTypes) });
+        //console.log("Sending types:", JSON.stringify(updatedTypes)); // Stringify the array for logging
+        await request('PUT', `/board/types/move`, updatedTypes); // Send the array directly
+        window.location.reload();
       } catch (error) {
         console.error("Failed to update type order", error);
       }
@@ -136,6 +135,7 @@ const Board = () => {
     try {
       console.log("Sending moveTasks:", JSON.stringify(moveTasks, null, 2));
       await request('PUT', `/board/tasks/move`, { moveTasks: moveTasks });
+      window.location.reload();
     } catch (error) {
       console.error("Failed to update task order between types", error);
     }
