@@ -58,9 +58,9 @@ export const testData = {
       'type-3': { id: 'type-3', name: 'Done', order: 2 },
     },
     tasks: {
-      'task-1': { id: 'task-1', name: 'Task 1', description: 'This is task 1', deadline: '2024-05-30T10:00:00Z', created_at: '2024-05-15T10:00:00Z', typeId: 'type-1', order: 0 },
-      'task-2': { id: 'task-2', name: 'Task 2', description: 'This is task 2', deadline: '2024-05-30T10:00:00Z', created_at: '2024-05-15T10:00:00Z', typeId: 'type-1', order: 1 },
-      'task-3': { id: 'task-3', name: 'Task 3', description: 'This is task 3', deadline: '2024-05-30T10:00:00Z', created_at: '2024-05-15T10:00:00Z', typeId: 'type-3', order: 0 },
+      'task-1': { id: 'task-1', name: 'Task 1', description: 'This is task 1', deadline: '2024-05-30T10:00:00Z', createdAt: '2024-05-15T10:00:00Z', typeId: 'type-1', order: 0 },
+      'task-2': { id: 'task-2', name: 'Task 2', description: 'This is task 2', deadline: '2024-05-30T10:00:00Z', createdAt: '2024-05-15T10:00:00Z', typeId: 'type-1', order: 1 },
+      'task-3': { id: 'task-3', name: 'Task 3', description: 'This is task 3', deadline: '2024-05-30T10:00:00Z', createdAt: '2024-05-15T10:00:00Z', typeId: 'type-3', order: 0 },
     },
   };
   

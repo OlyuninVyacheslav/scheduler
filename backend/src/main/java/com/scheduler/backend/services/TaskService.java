@@ -7,6 +7,7 @@ import com.scheduler.backend.entities.Task;
 import com.scheduler.backend.entities.TypeOfTask;
 import com.scheduler.backend.repositories.BoardRepository;
 import com.scheduler.backend.repositories.TaskRepository;
+import com.scheduler.backend.repositories.TaskUserRepository;
 import com.scheduler.backend.repositories.TypeOfTaskRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,13 +28,16 @@ public class TaskService {
     private final TypeOfTaskRepository taskTypeRepository;
     private final ModelMapper modelMapper;
     private final BoardRepository boardRepository;
+
     @Autowired
-    public TaskService(TaskRepository taskRepository, TypeOfTaskRepository taskTypeRepository, ModelMapper modelMapper, BoardRepository boardRepository) {
+    public TaskService(TaskRepository taskRepository, TypeOfTaskRepository taskTypeRepository, ModelMapper modelMapper, BoardRepository boardRepository                       ) {
         this.taskRepository = taskRepository;
         this.taskTypeRepository = taskTypeRepository;
         this.modelMapper = modelMapper;
         this.boardRepository = boardRepository;
+        //this.taskUserRepository = taskUserRepository;
     }
+
 
     @Transactional
     public TaskDto createTask(TaskDto taskDto) {
@@ -75,19 +79,53 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
     return modelMapper.map(updatedTask, TaskDto.class);
 }
 
+//    public TaskDto moveTask(Long taskId, Long toTypeId) {
+//        Task task = taskRepository.findById(taskId)
+//                .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
+//
+//        TypeOfTask newTaskType = taskTypeRepository.findById(toTypeId)
+//                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + toTypeId));
+//
+//        task.setTypeId(newTaskType);
+//
+//        Task movedTask = taskRepository.save(task);
+//        return modelMapper.map(movedTask, TaskDto.class);
+//    }
+public void moveTask(Long taskId, Long sourceTypeId, Long destinationTypeId, Integer newOrder) {
+    Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
 
-    public TaskDto moveTask(Long taskId, Long toTypeId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
+    TypeOfTask destinationType = taskTypeRepository.findById(destinationTypeId)
+            .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + destinationTypeId));
 
-        TypeOfTask newTaskType = taskTypeRepository.findById(toTypeId)
-                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + toTypeId));
+    task.setTypeId(destinationType);
+    task.setOrder(newOrder);
 
-        task.setTypeId(newTaskType);
+    taskRepository.save(task);
 
-        Task movedTask = taskRepository.save(task);
-        return modelMapper.map(movedTask, TaskDto.class);
+    // Update orders in source and destination types
+    List<Task> sourceTasks = taskRepository.findByTaskTypeId(sourceTypeId)
+            .stream()
+            .filter(t -> !t.getId().equals(taskId))
+            .sorted((a, b) -> a.getOrder().compareTo(b.getOrder()))
+            .collect(Collectors.toList());
+
+    for (int i = 0; i < sourceTasks.size(); i++) {
+        sourceTasks.get(i).setOrder(i);
+        taskRepository.save(sourceTasks.get(i));
     }
+
+    List<Task> destinationTasks = taskRepository.findByTaskTypeId(destinationTypeId)
+            .stream()
+            .sorted((a, b) -> a.getOrder().compareTo(b.getOrder()))
+            .collect(Collectors.toList());
+
+    for (int i = 0; i < destinationTasks.size(); i++) {
+        destinationTasks.get(i).setOrder(i);
+        taskRepository.save(destinationTasks.get(i));
+    }
+}
+
 
     public void deleteTask(Long taskId) {
         Task task = taskRepository.findById(taskId)
@@ -96,13 +134,7 @@ public TaskDto updateTask(Long taskId, TaskDto taskDto) {
         taskRepository.delete(task);
     }
 
-//    public List<TaskDto> getTasksByType(Long typeId) {
-//        List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
-//        return tasks.stream()
-//                .map(task -> modelMapper.map(task, TaskDto.class))
-//                //.map(task -> new TaskDto(task.getId(), task.getName(), task.getTypeId(),task.getDescription(), task.getDeadline(), task.getOrder(), task.getCreatedAt()))
-//                .collect(Collectors.toList());
-//    }
+
 public List<TaskDto> getTasksByType(Long typeId) {
     List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
     return tasks.stream()

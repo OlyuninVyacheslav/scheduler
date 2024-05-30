@@ -1,2 +1,10 @@
-package com.scheduler.backend.repositories;public interface UserRoleRepository {
+package com.scheduler.backend.repositories;
+
+import com.scheduler.backend.entities.UserRole;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
+
 }

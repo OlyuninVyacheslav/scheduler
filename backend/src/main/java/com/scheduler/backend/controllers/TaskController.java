@@ -1,11 +1,15 @@
 package com.scheduler.backend.controllers;
 import com.scheduler.backend.config.UserAuthenticationProvider;
+import com.scheduler.backend.dtos.MoveTaskRequest;
 import com.scheduler.backend.dtos.TaskDto;
 import com.scheduler.backend.dtos.TypeOfTaskDto;
 import com.scheduler.backend.dtos.UserDto;
+import com.scheduler.backend.entities.Task;
+import com.scheduler.backend.entities.TaskUser;
 import com.scheduler.backend.entities.TypeOfTask;
 import com.scheduler.backend.entities.User;
 import com.scheduler.backend.repositories.TaskRepository;
+import com.scheduler.backend.repositories.TaskUserRepository;
 import com.scheduler.backend.repositories.TypeOfTaskRepository;
 import com.scheduler.backend.repositories.UserRepository;
 import com.scheduler.backend.services.TaskService;
@@ -27,6 +31,7 @@ public class TaskController {
     private final TypeOfTaskRepository typeOfTaskRepository;
     private final UserRepository userRepository;
     private final UserAuthenticationProvider userAuthenticationProvider;
+
 
     @Autowired
     public TaskController(TaskService taskService, TaskRepository taskRepository, TypeOfTaskRepository typeOfTaskRepository, UserRepository userRepository, UserAuthenticationProvider userAuthenticationProvider) {
@@ -113,20 +118,6 @@ public class TaskController {
     //endregion
 
     //region Task
-//    @PostMapping("/type/task/create")
-//    public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
-//        try {
-//            String jwt = token.substring(7);
-//            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
-//            TaskDto createdTask = taskService.createTask(taskDto);
-//            System.out.println(createdTask);
-//            return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
-//        } catch (EntityNotFoundException e) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-//    }
     @PostMapping("/type/task/create")
     public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
         try {
@@ -168,15 +159,29 @@ public ResponseEntity<TaskDto> updateTask(@PathVariable Long taskId, @RequestBod
 }
 
 
-    @PutMapping("/type/task/{taskId}/move")
-    public ResponseEntity<TaskDto> moveTask(@PathVariable Long taskId, @RequestParam Long toTypeId) {
-        try {
-            TaskDto movedTask = taskService.moveTask(taskId, toTypeId);
-            return ResponseEntity.ok(movedTask);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+//    @PutMapping("/type/tasks/{taskId}")
+//    public ResponseEntity<TaskDto> moveTask(@PathVariable Long taskId, @RequestParam Long toTypeId, @RequestHeader("Authorization") String token) {
+//        try {
+//            String jwt = token.substring(7);
+//            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
+//            TaskDto movedTask = taskService.moveTask(taskId, toTypeId);
+//            return ResponseEntity.ok(movedTask);
+//        } catch (EntityNotFoundException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
+@PutMapping("/type/task/move")
+public ResponseEntity<Void> moveTask(@RequestBody MoveTaskRequest moveTaskRequest, @RequestHeader("Authorization") String token) {
+    try {
+        // Assuming you have a way to validate the token
+        taskService.moveTask(moveTaskRequest.getTaskId(), moveTaskRequest.getSourceTypeId(), moveTaskRequest.getDestinationTypeId(), moveTaskRequest.getNewOrder());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (NoSuchElementException e) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
 
     @DeleteMapping("/type/task/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {

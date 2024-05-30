@@ -3,19 +3,17 @@ import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import Type from './Type';
 import { request } from '../../helpers/axios_helper';
-import { initialData } from '../testData';
 import BoardControl from '../BoardControl';
-import { formatDate, formatDateDead } from '../../helpers/formatDate';
 
 const Board = () => {
   const params = useParams();
   const boardId = params.boardId;
   const [data, setData] = useState({ types: {}, tasks: {} });
-  //const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
+      // Fetching types and tasks from the server
       const typesResponse = await request('GET', `/board/types/${boardId}`);
       const typesData = typesResponse.data;
 
@@ -54,6 +52,7 @@ const Board = () => {
 
     if (!destination) return;
 
+    // Handling type reordering
     if (type === 'type') {
       const newTypeOrder = Array.from(Object.values(data.types));
       const [moved] = newTypeOrder.splice(source.index, 1);
@@ -80,6 +79,7 @@ const Board = () => {
       return;
     }
 
+    // Handling task reordering within the same type
     const startType = data.types[source.droppableId];
     const finishType = data.types[destination.droppableId];
 
@@ -115,6 +115,7 @@ const Board = () => {
       return;
     }
 
+    // Handling task reordering between different types
     const startTaskOrder = Object.values(data.tasks)
       .filter(task => task.typeId === startType.id)
       .sort((a, b) => a.order - b.order);
@@ -151,8 +152,13 @@ const Board = () => {
     setData(newState);
 
     try {
-      await request('PUT', `/board/type/tasks/${startType.id}`, { tasks: Object.values(updatedStartTasks) });
-      await request('PUT', `/board/type/tasks/${finishType.id}`, { tasks: Object.values(updatedFinishTasks) });
+      // Updating the server with the new task order and type
+      await request('PUT', `/board/type/task/move`, {
+        taskId: draggableId,
+        sourceTypeId: source.droppableId,
+        destinationTypeId: destination.droppableId,
+        newOrder: destination.index
+      });
     } catch (error) {
       console.error("Failed to update task order between types", error);
     }
@@ -177,7 +183,7 @@ const Board = () => {
                 .sort((a, b) => a.order - b.order)
                 .map((type, index) => {
                   const tasks = Object.values(data.tasks)
-                    .filter(task => task.typeId === type.id) // Ensure correct mapping
+                    .filter(task => task.typeId === type.id)
                     .sort((a, b) => a.order - b.order);
 
                   return <Type key={type.id} type={type} tasks={tasks} index={index} refreshBoard={refreshBoard} />;
