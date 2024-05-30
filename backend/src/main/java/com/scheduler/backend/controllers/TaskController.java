@@ -1,9 +1,6 @@
 package com.scheduler.backend.controllers;
 import com.scheduler.backend.config.UserAuthenticationProvider;
-import com.scheduler.backend.dtos.MoveTaskRequest;
-import com.scheduler.backend.dtos.TaskDto;
-import com.scheduler.backend.dtos.TypeOfTaskDto;
-import com.scheduler.backend.dtos.UserDto;
+import com.scheduler.backend.dtos.*;
 import com.scheduler.backend.entities.Task;
 import com.scheduler.backend.entities.TaskUser;
 import com.scheduler.backend.entities.TypeOfTask;
@@ -20,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -182,6 +181,44 @@ public ResponseEntity<Void> moveTask(@RequestBody MoveTaskRequest moveTaskReques
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+
+    @PutMapping("/type/tasks/dnd")
+    public ResponseEntity<Void> updateTasksInType(@RequestBody List<TaskDto> tasks, @RequestHeader("Authorization") String token) {
+        try {
+            String jwt = token.substring(7);
+            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
+            for (TaskDto taskDto : tasks) {
+                Task task = taskRepository.findById(taskDto.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskDto.getId()));
+                task.setOrder(taskDto.getOrder().intValue());
+                TypeOfTask taskType = typeOfTaskRepository.findById(taskDto.getTypeId())
+                        .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId()));
+                task.setTypeId(taskType);
+                taskRepository.save(task);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/tasks/move")
+    public ResponseEntity<Void> moveTasks(@RequestHeader("Authorization") String token, @RequestBody Map<String, List<MoveTaskRequest>> moveTasks) {
+        try {
+            List<MoveTaskRequest> taskRequests = moveTasks.get("moveTasks");
+            for (MoveTaskRequest moveRequest : taskRequests) {
+                taskService.moveTask(moveRequest.getTaskId(), moveRequest.getSourceTypeId(), moveRequest.getDestinationTypeId(), moveRequest.getNewOrder());
+            }
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @DeleteMapping("/type/task/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
