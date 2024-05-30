@@ -1,73 +1,85 @@
 package com.scheduler.backend.tests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.scheduler.backend.dtos.BoardDto;
-import com.scheduler.backend.dtos.UserDto;
-import com.scheduler.backend.entities.User;
-import com.scheduler.backend.repositories.UserRepository;
-import com.scheduler.backend.services.BoardService;
 import com.scheduler.backend.config.UserAuthenticationProvider;
+import com.scheduler.backend.controllers.BoardController;
+import com.scheduler.backend.dtos.BoardDto;
+import com.scheduler.backend.services.BoardService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.Collections;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class BoardControllerTest {
+@ExtendWith(MockitoExtension.class)
+class BoardControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private UserRepository userRepository;
-
-    @MockBean
+    @Mock
     private BoardService boardService;
 
-    @MockBean
+    @Mock
     private UserAuthenticationProvider userAuthenticationProvider;
 
+    @InjectMocks
+    private BoardController boardController;
+
+    private MockMvc mockMvc;
+
     @Test
-    public void testCreateBoard() throws Exception {
-        User mockUser = new User();
-        mockUser.setId(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
-
-        BoardDto boardDto = new BoardDto(); // Initialize with appropriate values if needed
+    void getBoardById_ReturnsBoard_WhenValidId() throws Exception {
+        // Arrange
+        BoardDto boardDto = new BoardDto();
+        boardDto.setId(1L);
         boardDto.setName("Test Board");
+        when(boardService.getBoardById(anyLong())).thenReturn(boardDto);
 
-        UserDto userDto = new UserDto();
-        userDto.setId(1L);
+        mockMvc = MockMvcBuilders.standaloneSetup(boardController).build();
 
-        Authentication authentication = Mockito.mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(userDto);
-        when(userAuthenticationProvider.validateToken(Mockito.anyString())).thenReturn(authentication);
-
-        String token = "Bearer valid.jwt.token";
-
-        when(boardService.createBoard(Mockito.any(BoardDto.class), Mockito.any(User.class)))
-                .thenReturn(boardDto);
-
-        mockMvc.perform(post("/boards/create")
-                        .header("Authorization", token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(boardDto)))
-                .andExpect(status().isCreated());
+        // Act & Assert
+        mockMvc.perform(get("/boards/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Test Board"));
     }
 
-    private static String asJsonString(final Object obj) {
+
+    @Test
+    void getAllBoards_ReturnsListOfBoards_WhenValidToken() throws Exception {
+        // Arrange
+        BoardDto boardDto = BoardDto.builder()
+                .id(1L)
+                .name("Test Board")
+                .description("Test Description")
+                .createdAt(LocalDateTime.now())
+                .build();
+        when(boardService.getAllBoardsForCurrentUser(anyLong())).thenReturn(Collections.singletonList(boardDto));
+
+        mockMvc = MockMvcBuilders.standaloneSetup(boardController).build();
+
+        // Act & Assert
+        mockMvc.perform(get("/boards")
+                        .header("Authorization", "Bearer token"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Test Board"))
+                .andExpect(jsonPath("$[0].description").value("Test Description"));
+    }
+
+    // Преобразование объекта в JSON строку для запроса
+    private String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);
         } catch (Exception e) {
