@@ -35,9 +35,6 @@ public class TaskControllerTest {
     private TaskService taskService;
 
     @Mock
-    private TypeService typeService;
-
-    @Mock
     private UserAuthenticationProvider userAuthenticationProvider;
 
     @InjectMocks
@@ -57,105 +54,6 @@ public class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
-
-    @Test
-    void createTaskType_ReturnsCreatedTaskType_WhenValidInput() throws Exception {
-        // Arrange
-        TypeOfTaskDto inputDto = TypeOfTaskDto.builder()
-                .name("Test Type")
-                .order(1)
-                .build();
-        TypeOfTaskDto expectedDto = TypeOfTaskDto.builder()
-                .id(1L)
-                .name("Test Type")
-                .order(1)
-                .build();
-        when(typeService.createType(anyLong(), any(TypeOfTaskDto.class)))
-                .thenReturn(expectedDto);
-
-        mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
-
-        // Act & Assert
-        mockMvc.perform(post("/board/{boardId}/type", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(inputDto))
-                        .header("Authorization", "Bearer token"))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Test Type"))
-                .andExpect(jsonPath("$.order").value(1));
-    }
-
-    // Преобразование объекта в JSON строку для запроса
-    private String asJsonString(final Object obj) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            return mapper.writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    void moveTypes_ReturnsOk_WhenValidInput() throws Exception {
-        // Arrange
-        List<TypeOfTaskDto> updatedTypes = Collections.emptyList();
-        doNothing().when(typeService).moveTypes(anyList());
-
-        mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
-
-        // Act & Assert
-        mockMvc.perform(put("/board/types/move")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(updatedTypes))
-                        .header("Authorization", "Bearer token"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void updateTaskType_ReturnsUpdatedTaskType_WhenValidInput() throws Exception {
-        // Arrange
-        TypeOfTaskDto inputDto = TypeOfTaskDto.builder()
-                .name("Updated Type")
-                .order(2)
-                .build();
-        TypeOfTaskDto expectedDto = TypeOfTaskDto.builder()
-                .id(1L)
-                .name("Updated Type")
-                .order(2)
-                .build();
-        when(typeService.updateType(anyLong(), any(TypeOfTaskDto.class)))
-                .thenReturn(expectedDto);
-
-        mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
-
-        // Act & Assert
-        mockMvc.perform(put("/board/type/{typeId}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(inputDto))
-                        .header("Authorization", "Bearer token"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Updated Type"))
-                .andExpect(jsonPath("$.order").value(2));
-    }
-
-    @Test
-    void deleteTaskType_ReturnsNoContent_WhenValidTypeId() throws Exception {
-        // Arrange
-        doNothing().when(typeService).deleteType(anyLong());
-
-        mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
-
-        // Act & Assert
-        mockMvc.perform(delete("/board/type/{typeId}", 1)
-                        .header("Authorization", "Bearer token"))
-                .andExpect(status().isNoContent());
-    }
-
 
     @Test
     void moveTask_ReturnsNoContent_WhenValidInput() throws Exception {
@@ -202,6 +100,13 @@ public class TaskControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-
-    // Add more tests for other controller methods similarly
+    private String asJsonString(final Object obj) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            return mapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
