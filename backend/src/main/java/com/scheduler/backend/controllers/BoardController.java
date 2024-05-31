@@ -1,4 +1,5 @@
 package com.scheduler.backend.controllers;
+
 import com.scheduler.backend.config.UserAuthenticationProvider;
 import com.scheduler.backend.dtos.BoardDto;
 import com.scheduler.backend.dtos.UserDto;
@@ -39,26 +40,21 @@ public class BoardController {
 
     @PostMapping("/create")
     public ResponseEntity<BoardDto> createBoard(@RequestBody BoardDto boardDTO, @RequestHeader("Authorization") String token) {
-        try{
+        try {
             String jwt = token.substring(7);
             Authentication authentication = userAuthenticationProvider.validateToken(jwt);
             Long creatorId = ((UserDto) authentication.getPrincipal()).getId();
             User creator = userRepository.findById(creatorId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + creatorId));
             BoardDto createdBoard = boardService.createBoard(boardDTO, creator);
-            //System.out.println("CreatedBoard: "+ createdBoard.getName() + " " + createdBoard.getCreator());
             return new ResponseEntity<>(createdBoard, HttpStatus.CREATED);
-        }catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        catch( Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
     }
-
-
-
 
     @GetMapping
     public ResponseEntity<List<BoardDto>> getAllBoards(@RequestHeader("Authorization") String token) {
@@ -72,6 +68,4 @@ public class BoardController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
-
-    // Другие методы контроллера, например, для обновления, удаления и т.д.
 }

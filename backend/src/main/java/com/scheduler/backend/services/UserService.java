@@ -18,11 +18,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final UserMapper userMapper;
 
     public UserDto login(CredentialsDto credentialsDto) {
@@ -41,12 +38,9 @@ public class UserService {
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
         }
-
         User user = userMapper.signUpToUser(userDto);
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
-
         User savedUser = userRepository.save(user);
-
         return userMapper.toUserDto(savedUser);
     }
 
@@ -55,6 +49,4 @@ public class UserService {
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
         return userMapper.toUserDto(user);
     }
-
-
 }

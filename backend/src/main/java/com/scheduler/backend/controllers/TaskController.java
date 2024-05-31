@@ -1,4 +1,5 @@
 package com.scheduler.backend.controllers;
+
 import com.scheduler.backend.config.UserAuthenticationProvider;
 import com.scheduler.backend.dtos.*;
 import com.scheduler.backend.entities.Task;
@@ -37,6 +38,7 @@ public class TaskController {
         this.userRepository = userRepository;
         this.userAuthenticationProvider = userAuthenticationProvider;
     }
+
     @GetMapping("/type/tasks/{typeId}")
     public ResponseEntity<List<TaskDto>> getTasksByType(@PathVariable Long typeId, @RequestHeader("Authorization") String token) {
         try {
@@ -44,23 +46,6 @@ public class TaskController {
             Authentication authentication = userAuthenticationProvider.validateToken(jwt);
             List<TaskDto> tasks = taskService.getTasksByType(typeId);
             return ResponseEntity.ok(tasks);
-        }catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-    }
-
-
-
-    @GetMapping("/types/{boardId}")
-    public ResponseEntity<List<TypeOfTaskDto>> getTaskTypesByBoardId(@PathVariable Long boardId, @RequestHeader("Authorization") String token) {
-        try {
-            String jwt = token.substring(7);
-            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
-            List<TypeOfTaskDto> taskTypes = taskService.getTaskTypesByBoardId(boardId);
-            return ResponseEntity.ok(taskTypes);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -68,64 +53,6 @@ public class TaskController {
         }
     }
 
-
-    //region TaskType
-    @PostMapping("/{boardId}/type")
-    public ResponseEntity<TypeOfTaskDto> createTaskType(@PathVariable Long boardId, @RequestBody TypeOfTaskDto taskTypeDto, @RequestHeader("Authorization") String token) {
-        try {
-            String jwt = token.substring(7);
-            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
-
-            TypeOfTaskDto createdTaskType = taskService.createTaskType(boardId, taskTypeDto);
-            return new ResponseEntity<>(createdTaskType, HttpStatus.CREATED);
-        } catch (EntityNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-    }
-    
-    @PutMapping("/types/move")
-    public ResponseEntity<String> moveTypes(@RequestBody List<TypeOfTaskDto> updatedTypes) {
-        try {
-            taskService.moveTypes(updatedTypes);
-            return ResponseEntity.ok("Types moved successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to move types: " + e.getMessage());
-        }
-    }
-
-    @PutMapping("/type/{typeId}")
-    public ResponseEntity<TypeOfTaskDto> updateTaskType(@PathVariable Long typeId, @RequestBody TypeOfTaskDto updatedTypeDto, @RequestHeader("Authorization") String token) {
-        try {
-            String jwt = token.substring(7);
-            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
-            TypeOfTaskDto updatedType = taskService.updateTaskType(typeId, updatedTypeDto);
-            return ResponseEntity.ok(updatedType);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    @DeleteMapping("/type/{typeId}")
-    public ResponseEntity<Void> deleteTaskType(@PathVariable Long typeId, @RequestHeader("Authorization") String token) {
-        try {
-            String jwt = token.substring(7);
-            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
-            taskService.deleteTaskType(typeId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    //endregion
-
-
-    //region Task
     @PostMapping("/type/task/create")
     public ResponseEntity<?> createTask(@RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
         try {
@@ -141,43 +68,37 @@ public class TaskController {
         } catch (SecurityException e) {
             return new ResponseEntity<>("Error: Invalid or expired token", HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-
             return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-@PutMapping("/type/task/{taskId}")
-public ResponseEntity<TaskDto> updateTask(@PathVariable String taskId, @RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
-    try {
-        String jwt = token.substring(7);
-        Authentication authentication = userAuthenticationProvider.validateToken(jwt);
-        Long creatorId = ((UserDto) authentication.getPrincipal()).getId();
-        User creator = userRepository.findById(creatorId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + creatorId));
-
-        TaskDto updatedTask = taskService.updateTask(taskId, taskDto);
-        return ResponseEntity.ok(updatedTask);
-    } catch (EntityNotFoundException e) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } catch (NoSuchElementException e) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND); // or a more specific status
-    } catch (Exception e) {
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // for unexpected errors
+    @PutMapping("/type/task/{taskId}")
+    public ResponseEntity<TaskDto> updateTask(@PathVariable String taskId, @RequestBody TaskDto taskDto, @RequestHeader("Authorization") String token) {
+        try {
+            String jwt = token.substring(7);
+            Authentication authentication = userAuthenticationProvider.validateToken(jwt);
+            TaskDto updatedTask = taskService.updateTask(taskId, taskDto);
+            return ResponseEntity.ok(updatedTask);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-}
 
-@PutMapping("/type/task/move")
-public ResponseEntity<Void> moveTask(@RequestBody MoveTaskRequest moveTaskRequest, @RequestHeader("Authorization") String token) {
-    try {
-        // Assuming you have a way to validate the token
-        taskService.moveTask(moveTaskRequest.getTaskId(), moveTaskRequest.getSourceTypeId(), moveTaskRequest.getDestinationTypeId(), moveTaskRequest.getNewOrder());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (NoSuchElementException e) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } catch (Exception e) {
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    @PutMapping("/type/task/move")
+    public ResponseEntity<Void> moveTask(@RequestBody MoveTaskRequest moveTaskRequest, @RequestHeader("Authorization") String token) {
+        try {
+            taskService.moveTask(moveTaskRequest.getTaskId(), moveTaskRequest.getSourceTypeId(), moveTaskRequest.getDestinationTypeId(), moveTaskRequest.getNewOrder());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-}
 
     @PutMapping("/type/tasks/dnd")
     public ResponseEntity<Void> updateTasksInType(@RequestBody List<TaskDto> tasks, @RequestHeader("Authorization") String token) {
@@ -214,7 +135,6 @@ public ResponseEntity<Void> moveTask(@RequestBody MoveTaskRequest moveTaskReques
         }
     }
 
-
     @DeleteMapping("/type/task/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable String taskId) {
         try {
@@ -224,5 +144,4 @@ public ResponseEntity<Void> moveTask(@RequestBody MoveTaskRequest moveTaskReques
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    //endregion
 }

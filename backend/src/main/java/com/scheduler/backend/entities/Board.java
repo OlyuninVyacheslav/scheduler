@@ -40,13 +40,10 @@ public class Board {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // Constructors
-
     public Board(String name, User creator, LocalDateTime createdAt) {
         this.name = name;
         this.creator = creator;
-        this.createdAt = createdAt; // Automatically set creation timestamp
+        this.createdAt = createdAt;
     }
 
-    // Getters and setters
 }

@@ -4,24 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scheduler.backend.config.UserAuthenticationProvider;
 import com.scheduler.backend.controllers.TaskController;
 import com.scheduler.backend.dtos.MoveTaskRequest;
-import com.scheduler.backend.dtos.TaskDto;
 import com.scheduler.backend.dtos.TypeOfTaskDto;
 import com.scheduler.backend.services.TaskService;
+import com.scheduler.backend.services.TypeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +33,9 @@ public class TaskControllerTest {
 
     @Mock
     private TaskService taskService;
+
+    @Mock
+    private TypeService typeService;
 
     @Mock
     private UserAuthenticationProvider userAuthenticationProvider;
@@ -71,7 +70,7 @@ public class TaskControllerTest {
                 .name("Test Type")
                 .order(1)
                 .build();
-        when(taskService.createTaskType(anyLong(), any(TypeOfTaskDto.class)))
+        when(typeService.createType(anyLong(), any(TypeOfTaskDto.class)))
                 .thenReturn(expectedDto);
 
         mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
@@ -103,7 +102,7 @@ public class TaskControllerTest {
     void moveTypes_ReturnsOk_WhenValidInput() throws Exception {
         // Arrange
         List<TypeOfTaskDto> updatedTypes = Collections.emptyList();
-        doNothing().when(taskService).moveTypes(anyList());
+        doNothing().when(typeService).moveTypes(anyList());
 
         mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
 
@@ -127,7 +126,7 @@ public class TaskControllerTest {
                 .name("Updated Type")
                 .order(2)
                 .build();
-        when(taskService.updateTaskType(anyLong(), any(TypeOfTaskDto.class)))
+        when(typeService.updateType(anyLong(), any(TypeOfTaskDto.class)))
                 .thenReturn(expectedDto);
 
         mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
@@ -147,7 +146,7 @@ public class TaskControllerTest {
     @Test
     void deleteTaskType_ReturnsNoContent_WhenValidTypeId() throws Exception {
         // Arrange
-        doNothing().when(taskService).deleteTaskType(anyLong());
+        doNothing().when(typeService).deleteType(anyLong());
 
         mockMvc = MockMvcBuilders.standaloneSetup(taskController).build();
 

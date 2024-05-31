@@ -34,7 +34,6 @@ public class TaskService {
         this.taskTypeRepository = taskTypeRepository;
         this.modelMapper = modelMapper;
         this.boardRepository = boardRepository;
-        //this.taskUserRepository = taskUserRepository;
     }
 
 
@@ -58,45 +57,31 @@ public class TaskService {
         return modelMapper.map(savedTask, TaskDto.class);
     }
 
-public TaskDto updateTask(String taskId, TaskDto taskDto) {
-    Task task = taskRepository.findById(taskId)
-            .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
+    public TaskDto updateTask(String taskId, TaskDto taskDto) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
 
-    // Ensure the task type exists before setting it
-    if (taskDto.getTypeId() != null && taskDto.getTypeId() != null) {
-        TypeOfTask taskType = taskTypeRepository.findById(taskDto.getTypeId())
-                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId()));
-        task.setTypeId(taskType);
+
+        if (taskDto.getTypeId() != null && taskDto.getTypeId() != null) {
+            TypeOfTask taskType = taskTypeRepository.findById(taskDto.getTypeId())
+                    .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + taskDto.getTypeId()));
+            task.setTypeId(taskType);
+        }
+
+        task.setName(taskDto.getName());
+        task.setDescription(taskDto.getDescription());
+        task.setDeadline(taskDto.getDeadline());
+
+        Task updatedTask = taskRepository.save(task);
+        return modelMapper.map(updatedTask, TaskDto.class);
     }
 
-    // Update other task fields
-    task.setName(taskDto.getName());
-    task.setDescription(taskDto.getDescription());
-    task.setDeadline(taskDto.getDeadline());
-
-    Task updatedTask = taskRepository.save(task);
-    return modelMapper.map(updatedTask, TaskDto.class);
-}
-
-//    public TaskDto moveTask(Long taskId, Long toTypeId) {
-//        Task task = taskRepository.findById(taskId)
-//                .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
-//
-//        TypeOfTask newTaskType = taskTypeRepository.findById(toTypeId)
-//                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + toTypeId));
-//
-//        task.setTypeId(newTaskType);
-//
-//        Task movedTask = taskRepository.save(task);
-//        return modelMapper.map(movedTask, TaskDto.class);
-//    }
-public void moveTasks(List<MoveTaskRequest> taskRequests) {
-    for (MoveTaskRequest moveRequest : taskRequests) {
-        moveTask(moveRequest.getTaskId(), moveRequest.getSourceTypeId(), moveRequest.getDestinationTypeId(), moveRequest.getNewOrder());
+    public void moveTasks(List<MoveTaskRequest> taskRequests) {
+        for (MoveTaskRequest moveRequest : taskRequests) {
+            moveTask(moveRequest.getTaskId(), moveRequest.getSourceTypeId(), moveRequest.getDestinationTypeId(), moveRequest.getNewOrder());
+        }
+        updateTaskOrders(taskRequests);
     }
-    // Обновление порядка задач в исходном и целевом типах задач
-    updateTaskOrders(taskRequests);
-}
 
     public void moveTask(String taskId, Long sourceTypeId, Long destinationTypeId, Integer newOrder) {
         Task task = taskRepository.findById(taskId)
@@ -112,7 +97,6 @@ public void moveTasks(List<MoveTaskRequest> taskRequests) {
     }
 
     private void updateTaskOrders(List<MoveTaskRequest> taskRequests) {
-        // Группируем задачи по исходному и целевому типам
         Map<Long, List<String>> sourceTypeTasks = new HashMap<>();
         Map<Long, List<String>> destinationTypeTasks = new HashMap<>();
 
@@ -149,90 +133,20 @@ public void moveTasks(List<MoveTaskRequest> taskRequests) {
         }
     }
 
-
     public void deleteTask(String taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
-
         taskRepository.delete(task);
     }
 
-
-public List<TaskDto> getTasksByType(Long typeId) {
-    List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
-    return tasks.stream()
-            .map(task -> {
-                TaskDto taskDto = modelMapper.map(task, TaskDto.class);
-                taskDto.setTypeId(task.getTypeId().getId());
-                return taskDto;
-            })
-            .collect(Collectors.toList());
-}
-    public List<TypeOfTaskDto> getTaskTypesByBoardId(Long boardId) {
-        List<TypeOfTask> types = taskTypeRepository.findByBoardId(boardId);
-        return types.stream()
-                .map(type -> new TypeOfTaskDto(type.getId(), type.getName(), type.getOrder()))
+    public List<TaskDto> getTasksByType(Long typeId) {
+        List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
+        return tasks.stream()
+                .map(task -> {
+                    TaskDto taskDto = modelMapper.map(task, TaskDto.class);
+                    taskDto.setTypeId(task.getTypeId().getId());
+                    return taskDto;
+                })
                 .collect(Collectors.toList());
     }
-
-    public TypeOfTaskDto createTaskType(Long boardId, TypeOfTaskDto taskTypeDto) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new EntityNotFoundException("Board not found"));
-        // Дополнительная логика валидации и сохранения типа задачи
-        TypeOfTask taskTypeEntity = new TypeOfTask();
-        taskTypeEntity.setName(taskTypeDto.getName());
-        // Установка связей с другими сущностями, если необходимо
-        // Например, boardId можно использовать для связи с доской
-        taskTypeEntity.setBoard(board);
-        Integer maxOrder = taskTypeRepository.findMaxOrder(boardId);
-
-        // Устанавливаем порядковый номер нового типа задачи
-        taskTypeEntity.setOrder(maxOrder != null ? maxOrder + 1 : 0);
-        // Сохранение в базе данных
-        TypeOfTask savedTaskType = taskTypeRepository.save(taskTypeEntity);
-
-        // Возврат DTO созданного типа задачи
-        TypeOfTaskDto createdTaskTypeDto = new TypeOfTaskDto();
-        createdTaskTypeDto.setName(savedTaskType.getName());
-        // Другие поля, если необходимо
-
-        return createdTaskTypeDto;
-    }
-
-    public void moveTypes(List<TypeOfTaskDto> updatedTypes) {
-        for (TypeOfTaskDto updatedType : updatedTypes) {
-            TypeOfTask type = taskTypeRepository.findById(updatedType.getId())
-                    .orElseThrow(() -> new NoSuchElementException("BoardType not found with id: " + updatedType.getId()));
-            type.setOrder(updatedType.getOrder());
-            taskTypeRepository.save(type);
-        }
-    }
-
-    public TypeOfTaskDto updateTaskType(Long typeId, TypeOfTaskDto updatedTypeDto) {
-        TypeOfTask type = taskTypeRepository.findById(typeId)
-                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + typeId));
-
-        type.setName(updatedTypeDto.getName()); // Обновляем имя типа задачи
-
-        TypeOfTask updatedType = taskTypeRepository.save(type); // Сохраняем обновленный тип задачи
-
-        return modelMapper.map(updatedType, TypeOfTaskDto.class);
-    }
-
-    public void deleteTaskType(Long typeId) {
-        // Находим все задачи, связанные с данным типом задачи
-        List<Task> tasks = taskRepository.findByTaskTypeId(typeId);
-
-        // Удаляем найденные задачи
-        taskRepository.deleteAll(tasks);
-
-        // Удаляем сам тип задачи
-        taskTypeRepository.deleteById(typeId);
-    }
-
-
-
-
-
-
 }
