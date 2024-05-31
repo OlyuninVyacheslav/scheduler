@@ -205,9 +205,7 @@ public ResponseEntity<Void> moveTask(@RequestBody MoveTaskRequest moveTaskReques
     public ResponseEntity<Void> moveTasks(@RequestHeader("Authorization") String token, @RequestBody Map<String, List<MoveTaskRequest>> moveTasks) {
         try {
             List<MoveTaskRequest> taskRequests = moveTasks.get("moveTasks");
-            for (MoveTaskRequest moveRequest : taskRequests) {
-                taskService.moveTask(moveRequest.getTaskId(), moveRequest.getSourceTypeId(), moveRequest.getDestinationTypeId(), moveRequest.getNewOrder());
-            }
+            taskService.moveTasks(taskRequests);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

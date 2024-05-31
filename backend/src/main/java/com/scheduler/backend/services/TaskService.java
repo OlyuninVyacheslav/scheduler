@@ -1,5 +1,6 @@
 package com.scheduler.backend.services;
 
+import com.scheduler.backend.dtos.MoveTaskRequest;
 import com.scheduler.backend.dtos.TaskDto;
 import com.scheduler.backend.dtos.TypeOfTaskDto;
 import com.scheduler.backend.entities.Board;
@@ -15,8 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,40 +90,64 @@ public TaskDto updateTask(String taskId, TaskDto taskDto) {
 //        Task movedTask = taskRepository.save(task);
 //        return modelMapper.map(movedTask, TaskDto.class);
 //    }
-public void moveTask(String taskId, Long sourceTypeId, Long destinationTypeId, Integer newOrder) {
-    Task task = taskRepository.findById(taskId)
-            .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
-
-    TypeOfTask destinationType = taskTypeRepository.findById(destinationTypeId)
-            .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + destinationTypeId));
-
-    task.setTypeId(destinationType);
-    task.setOrder(newOrder);
-
-    taskRepository.save(task);
-
-    // Update orders in source and destination types
-    List<Task> sourceTasks = taskRepository.findByTaskTypeId(sourceTypeId)
-            .stream()
-            .filter(t -> !t.getId().equals(taskId))
-            .sorted((a, b) -> a.getOrder().compareTo(b.getOrder()))
-            .collect(Collectors.toList());
-
-    for (int i = 0; i < sourceTasks.size(); i++) {
-        sourceTasks.get(i).setOrder(i);
-        taskRepository.save(sourceTasks.get(i));
+public void moveTasks(List<MoveTaskRequest> taskRequests) {
+    for (MoveTaskRequest moveRequest : taskRequests) {
+        moveTask(moveRequest.getTaskId(), moveRequest.getSourceTypeId(), moveRequest.getDestinationTypeId(), moveRequest.getNewOrder());
     }
-
-    List<Task> destinationTasks = taskRepository.findByTaskTypeId(destinationTypeId)
-            .stream()
-            .sorted((a, b) -> a.getOrder().compareTo(b.getOrder()))
-            .collect(Collectors.toList());
-
-    for (int i = 0; i < destinationTasks.size(); i++) {
-        destinationTasks.get(i).setOrder(i);
-        taskRepository.save(destinationTasks.get(i));
-    }
+    // Обновление порядка задач в исходном и целевом типах задач
+    updateTaskOrders(taskRequests);
 }
+
+    public void moveTask(String taskId, Long sourceTypeId, Long destinationTypeId, Integer newOrder) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NoSuchElementException("Task not found with id: " + taskId));
+
+        TypeOfTask destinationType = taskTypeRepository.findById(destinationTypeId)
+                .orElseThrow(() -> new NoSuchElementException("TaskType not found with id: " + destinationTypeId));
+
+        task.setTypeId(destinationType);
+        task.setOrder(newOrder);
+
+        taskRepository.save(task);
+    }
+
+    private void updateTaskOrders(List<MoveTaskRequest> taskRequests) {
+        // Группируем задачи по исходному и целевому типам
+        Map<Long, List<String>> sourceTypeTasks = new HashMap<>();
+        Map<Long, List<String>> destinationTypeTasks = new HashMap<>();
+
+        for (MoveTaskRequest request : taskRequests) {
+            sourceTypeTasks.computeIfAbsent(request.getSourceTypeId(), k -> new ArrayList<>()).add(request.getTaskId());
+            destinationTypeTasks.computeIfAbsent(request.getDestinationTypeId(), k -> new ArrayList<>()).add(request.getTaskId());
+        }
+
+        // Обновляем порядок задач в исходном типе
+        for (Long sourceTypeId : sourceTypeTasks.keySet()) {
+            List<Task> sourceTasks = taskRepository.findByTaskTypeId(sourceTypeId)
+                    .stream()
+                    .filter(t -> !sourceTypeTasks.get(sourceTypeId).contains(t.getId()))
+                    .sorted(Comparator.comparingInt(Task::getOrder))
+                    .collect(Collectors.toList());
+
+            for (int i = 0; i < sourceTasks.size(); i++) {
+                sourceTasks.get(i).setOrder(i);
+                taskRepository.save(sourceTasks.get(i));
+            }
+        }
+
+        // Обновляем порядок задач в целевом типе
+        for (Long destinationTypeId : destinationTypeTasks.keySet()) {
+            List<Task> destinationTasks = taskRepository.findByTaskTypeId(destinationTypeId)
+                    .stream()
+                    .sorted(Comparator.comparingInt(Task::getOrder))
+                    .collect(Collectors.toList());
+
+            for (int i = 0; i < destinationTasks.size(); i++) {
+                destinationTasks.get(i).setOrder(i);
+                taskRepository.save(destinationTasks.get(i));
+            }
+        }
+    }
 
 
     public void deleteTask(String taskId) {

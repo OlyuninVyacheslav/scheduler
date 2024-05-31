@@ -51,95 +51,149 @@ const Board = () => {
 
   const onDragEnd = async (result) => {
     const { destination, source, draggableId, type } = result;
+
+  if (!destination) return;
+
+  if (type === 'type') {
+    const newTypeOrder = Array.from(Object.values(data.types)).sort((a, b) => a.order - b.order);
+    const [moved] = newTypeOrder.splice(source.index, 1);
+    newTypeOrder.splice(destination.index, 0, moved);
+
+    const updatedTypes = newTypeOrder.map((type, index) => ({
+      ...type,
+      order: index
+    }));
+
+    const newState = {
+      ...data,
+      types: updatedTypes.reduce((acc, type) => {
+        acc[type.id] = type;
+        return acc;
+      }, {}),
+    };
+
+    setData(newState);
+
+    try {
+      console.log("Sending types:", JSON.stringify(updatedTypes));
+      await request('PUT', `/board/types/move`, updatedTypes);
+      refreshBoard();
+    } catch (error) {
+      console.error("Failed to update type order", error);
+    }
+
+    return;
+  }
+
   
-    if (!destination) return;
+    const startType = data.types[source.droppableId];
+    const finishType = data.types[destination.droppableId];
   
-    if (type === 'type') {
-      const newTypeOrder = Array.from(Object.values(data.types));
-      const [moved] = newTypeOrder.splice(source.index, 1);
-      newTypeOrder.splice(destination.index, 0, moved);
+    if (startType === finishType) {
+      const newTaskOrder = Array.from(Object.values(data.tasks)
+        .filter(task => task.typeId === startType.id)
+        .sort((a, b) => a.order - b.order));
   
-      const updatedTypes = newTypeOrder.map((type, index) => ({ id: type.id, name:type.name, order: index })); // Construct an array of TypeOfTaskDto objects
+      const [movedTask] = newTaskOrder.splice(source.index, 1);
+      newTaskOrder.splice(destination.index, 0, movedTask);
+  
+      const updatedTasks = newTaskOrder.map((task, index) => ({
+        ...task,
+        order: index
+      }));
   
       const newState = {
         ...data,
-        types: updatedTypes,
+        tasks: updatedTasks.reduce((acc, task) => {
+          acc[task.id] = task;
+          return acc;
+        }, {}),
       };
   
       setData(newState);
   
       try {
-        //console.log("Sending types:", JSON.stringify(updatedTypes)); // Stringify the array for logging
-        await request('PUT', `/board/types/move`, updatedTypes); // Send the array directly
-        window.location.reload();
+        await request('PUT', `/board/tasks/move`, {
+          moveTasks: updatedTasks.map(task => ({
+            taskId: task.id,
+            sourceTypeId: startType.id,
+            destinationTypeId: finishType.id,
+            newOrder: task.order,
+          })),
+        });
+        refreshBoard();
       } catch (error) {
-        console.error("Failed to update type order", error);
+        console.error("Failed to update task order within type", error);
       }
   
-      return;
-    }
+    } else {
+      const startTaskOrder = Array.from(Object.values(data.tasks)
+        .filter(task => task.typeId === startType.id)
+        .sort((a, b) => a.order - b.order));
   
-    const startType = data.types[source.droppableId];
-    const finishType = data.types[destination.droppableId];
+      const finishTaskOrder = Array.from(Object.values(data.tasks)
+        .filter(task => task.typeId === finishType.id)
+        .sort((a, b) => a.order - b.order));
   
-    const startTaskOrder = Object.values(data.tasks)
-      .filter(task => task.typeId === startType.id)
-      .sort((a, b) => a.order - b.order);
+      const [movedTask] = startTaskOrder.splice(source.index, 1);
+      movedTask.typeId = finishType.id;
   
-    const finishTaskOrder = Object.values(data.tasks)
-      .filter(task => task.typeId === finishType.id)
-      .sort((a, b) => a.order - b.order);
+      finishTaskOrder.splice(destination.index, 0, movedTask);
   
-    const [movedTask] = startTaskOrder.splice(source.index, 1);
-    movedTask.typeId = finishType.id;
+      const updatedStartTasks = startTaskOrder.map((task, index) => ({
+        ...task,
+        order: index
+      }));
   
-    finishTaskOrder.splice(destination.index, 0, movedTask);
+      const updatedFinishTasks = finishTaskOrder.map((task, index) => ({
+        ...task,
+        order: index
+      }));
   
-    const updatedStartTasks = startTaskOrder.reduce((acc, task, index) => {
-      acc[task.id] = { ...task, order: index };
-      return acc;
-    }, {});
+      const newState = {
+        ...data,
+        tasks: {
+          ...data.tasks,
+          ...updatedStartTasks.reduce((acc, task) => {
+            acc[task.id] = task;
+            return acc;
+          }, {}),
+          ...updatedFinishTasks.reduce((acc, task) => {
+            acc[task.id] = task;
+            return acc;
+          }, {}),
+          [movedTask.id]: movedTask,
+        },
+      };
   
-    const updatedFinishTasks = finishTaskOrder.reduce((acc, task, index) => {
-      acc[task.id] = { ...task, order: index };
-      return acc;
-    }, {});
+      setData(newState);
   
-    const newState = {
-      ...data,
-      tasks: {
-        ...data.tasks,
-        ...updatedStartTasks,
-        ...updatedFinishTasks,
-        [movedTask.id]: movedTask,
-      },
-    };
+      const moveTasks = [
+        ...updatedStartTasks.map(task => ({
+          taskId: task.id,
+          sourceTypeId: startType.id,
+          destinationTypeId: startType.id,
+          newOrder: task.order,
+        })),
+        ...updatedFinishTasks.map(task => ({
+          taskId: task.id,
+          sourceTypeId: startType.id,
+          destinationTypeId: finishType.id,
+          newOrder: task.order,
+        })),
+      ];
   
-    setData(newState);
-  
-    const moveTasks = [
-      ...Object.values(updatedStartTasks).map(task => ({
-        taskId: task.id,
-        sourceTypeId: startType.id,
-        destinationTypeId: startType.id,
-        newOrder: task.order,
-      })),
-      ...Object.values(updatedFinishTasks).map(task => ({
-        taskId: task.id,
-        sourceTypeId: startType.id,
-        destinationTypeId: finishType.id,
-        newOrder: task.order,
-      })),
-    ];
-  
-    try {
-      console.log("Sending moveTasks:", JSON.stringify(moveTasks, null, 2));
-      await request('PUT', `/board/tasks/move`, { moveTasks: moveTasks });
-      window.location.reload();
-    } catch (error) {
-      console.error("Failed to update task order between types", error);
+      try {
+        console.log("Sending moveTasks:", JSON.stringify(moveTasks, null, 2));
+        await request('PUT', `/board/tasks/move`, { moveTasks: moveTasks });
+        refreshBoard();
+      } catch (error) {
+        console.error("Failed to update task order between types", error);
+      }
     }
   };
+  
+  
   
 
   if (loading) {
