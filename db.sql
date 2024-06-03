@@ -69,18 +69,9 @@ CREATE TABLE task_user(
     PRIMARY KEY (user_id, task_id)
 );
 
-CREATE TABLE checklist(
-    id SERIAL PRIMARY KEY,
-    board_id INT REFERENCES board(id) ON DELETE CASCADE,
-    name TEXT,
-    deadline DATE,
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
 
-CREATE TABLE checklist_item(
-    id SERIAL PRIMARY KEY,
-    checklist_id INT REFERENCES checklist(id) ON DELETE CASCADE,
-    name TEXT,
-    deadline DATE,
-    flag BOOLEAN
+CREATE TABLE user_board(
+    board_id INT REFERENCES board(id) ON DELETE CASCADE,
+    user_id INT REFERENCES user_(id) ON DELETE CASCADE,
+    PRIMARY KEY (board_id, user_id)
 );
